@@ -15,6 +15,8 @@
 //#include "ee24c16.h"
 //set stream pointer
 //FILE usart0_str = FDEV_SETUP_STREAM(USART0SendByte, USART0ReceiveByte, _FDEV_SETUP_RW);
+#define F_CPU 8000000UL
+#include <util/delay.h>
 
 #define  EEMAXADDR 23
 
@@ -32,6 +34,7 @@ int main(void)
 	//USART0Init();
 	//
 	TWIInit();
+	DDRB |= (1 << DDB0);
 	//assign our stream to standard I/O streams
 	//stdin=stdout=&usart0_str;
 	//printf("\nWrite byte %#04x to eeprom address %#04x", 0x58, u16eaddress);
@@ -89,7 +92,8 @@ int main(void)
 			//printf_P(PSTR("\nFail!"));
 		}
 		//else printf_P(PSTR("\nStatus fail!"));
-		
+		PORTB ^= (1 << PORTB0);
+		_delay_ms(1000);
 		//TODO:: Please write your application code
 	}
 }
