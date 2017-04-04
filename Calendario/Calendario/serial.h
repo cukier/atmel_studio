@@ -8,19 +8,9 @@
 #ifndef SERIAL_H_
 #define SERIAL_H_
 
-#endif
-
-#ifndef F_CPU
-#define F_CPU 10000000UL
-#endif
-
-#ifndef BAUD
-#define BAUD 9600
-#endif
-
+#include "sys.h"
 #include <avr/io.h>
 #include <stdio.h>
-
 #include <util/setbaud.h>
 
 #ifndef loop_until_bit_is_set
@@ -32,9 +22,8 @@
 
 #ifdef __cplusplus
 extern "C" {
-
+	#endif
 	void uart_init(void);
-
 	#ifdef __cplusplus
 }
 #endif
