@@ -1,9 +1,9 @@
 /*
- * i2c.h
- *
- * Created: 03/04/2017 13:01:11
- *  Author: cuki
- */ 
+* i2c.h
+*
+* Created: 03/04/2017 13:01:11
+*  Author: cuki
+*/
 
 
 #ifndef I2C_H_

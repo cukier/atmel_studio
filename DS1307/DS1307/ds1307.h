@@ -1,9 +1,9 @@
 /*
- * ds1307.h
- *
- * Created: 03/04/2017 22:03:14
- *  Author: cuki
- */ 
+* ds1307.h
+*
+* Created: 03/04/2017 22:03:14
+*  Author: cuki
+*/
 
 
 #ifndef DS1307_H_
