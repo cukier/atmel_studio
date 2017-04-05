@@ -84,7 +84,7 @@ uint8_t TWIGetStatus(void)
 	return status;
 }
 
-uint8_t EEWriteByte(uint16_t u16addr, uint8_t u8data)
+uint8_t TWIWriteByte(uint16_t u16addr, uint8_t u8data)
 {
 	TWIStart();
 	
@@ -113,7 +113,7 @@ uint8_t EEWriteByte(uint16_t u16addr, uint8_t u8data)
 	return SUCCESS;
 }
 
-uint8_t EEReadByte(uint16_t u16addr, uint8_t *u8data)
+uint8_t TWIReadByte(uint16_t u16addr, uint8_t *u8data)
 {
 	//uint8_t databyte;
 	TWIStart();
@@ -154,7 +154,7 @@ uint8_t EEReadByte(uint16_t u16addr, uint8_t *u8data)
 	return SUCCESS;
 }
 
-uint8_t EEWritePage(uint8_t page, uint8_t *u8data)
+uint8_t TWIWritePage(uint8_t page, uint8_t *u8data)
 {
 	//calculate page address
 	uint8_t u8paddr = 0;
@@ -191,7 +191,7 @@ uint8_t EEWritePage(uint8_t page, uint8_t *u8data)
 	return SUCCESS;
 }
 
-uint8_t EEReadPage(uint8_t page, uint8_t *u8data)
+uint8_t TWIReadePage(uint8_t page, uint8_t *u8data)
 {
 	//calculate page address
 	uint8_t u8paddr = 0;

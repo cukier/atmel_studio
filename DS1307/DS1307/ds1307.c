@@ -10,31 +10,31 @@
 #include <stdio.h>
 
 uint8_t DS1307_getSeconds(uint8_t *seconds) {
-	return EEReadByte(0x00, seconds);
+	return TWIReadByte(0x00, seconds);
 }
 
 uint8_t DS1307_getMinutes(uint8_t *minutes) {
-	return EEReadByte(0x01, minutes);
+	return TWIReadByte(0x01, minutes);
 }
 
 uint8_t DS1307_getHours(uint8_t *hours) {
-	return EEReadByte(0x02, hours);
+	return TWIReadByte(0x02, hours);
 }
 
 uint8_t DS1307_getDay(uint8_t *day) {
-	return EEReadByte(0x03, day);
+	return TWIReadByte(0x03, day);
 }
 
 uint8_t DS1307_getDate(uint8_t *date) {
-	return EEReadByte(0x04, date);
+	return TWIReadByte(0x04, date);
 }
 
 uint8_t DS1307_getMonth(uint8_t *month) {
-	return EEReadByte(0x05, month);
+	return TWIReadByte(0x05, month);
 }
 
 uint8_t DS1307_getYear(uint8_t *year) {
-	return EEReadByte(0x06, year);
+	return TWIReadByte(0x06, year);
 }
 
 uint8_t DS1307_get(DS1307_t *ds1307) {
