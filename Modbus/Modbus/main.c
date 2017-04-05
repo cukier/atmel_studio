@@ -1,18 +1,24 @@
 /*
- * Modbus.c
- *
- * Created: 04/04/2017 21:16:28
- * Author : cuki
- */ 
+* Calendario.c
+*
+* Created: 04/04/2017 16:41:48
+* Author : cuki
+*/
 
-#include <avr/io.h>
-
+#include "sys.h"
+#include <util/delay.h>
+#include <>
 
 int main(void)
-{
-    /* Replace with your application code */
-    while (1) 
-    {
-    }
+{	
+	DDRB |= (1 << DDB0);
+	
+	while (1)
+	{
+		PORTB ^= (1 << PORTB0);
+		_delay_ms(1000);
+	}
+	
+	return 0;
 }
 
