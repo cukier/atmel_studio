@@ -20,9 +20,9 @@ void TWISetAddress(uint8_t address)
 
 void TWIInit(uint8_t address)
 {
-	//set SCL to 400kHz
+	//set SCL to 100kHz
 	TWSR = 0x00;
-	TWBR = 0x0C;
+	TWBR = 0x2A;
 	//enable TWI
 	TWCR = (1 << TWEN);
 	addr = address;
