@@ -5,7 +5,7 @@
 #include <stdbool.h>
 #include <avr/io.h>
 
-#define F_CPU 8000000UL
+#define F_CPU 10000000UL
 #define BAUD 9600
 
 #endif
