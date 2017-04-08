@@ -144,7 +144,7 @@ extern void uart_init(unsigned int baudrate);
  *             <br>Framing Error by UART
  */
 extern unsigned int uart_getc(void);
-
+uint16_t uart_get(uint8_t *data, uint16_t size);
 
 /**
  *  @brief   Put byte to ringbuffer for transmitting via UART

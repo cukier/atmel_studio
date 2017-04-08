@@ -513,6 +513,22 @@ unsigned int uart_getc(void)
 
 }/* uart_getc */
 
+uint16_t uart_get(uint8_t *data, uint16_t size) {
+	uint16_t c, cont;
+	
+	cont = 0;
+	
+	do {
+		c = uart_getc();
+		
+		if (!(c & UART_NO_DATA)) {
+			data[cont++] = (uint8_t) c;
+		}
+	} while (c != UART_NO_DATA);
+	
+	return cont;
+}
+
 
 /*************************************************************************
 Function: uart_putc()
