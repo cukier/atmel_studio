@@ -1,33 +1,37 @@
 /*
- * uart.c
- *
- * Created: 04/04/2017 22:21:12
- * Author : cuki
- */ 
+* uart.c
+*
+* Created: 04/04/2017 22:21:12
+* Author : cuki
+*/
 
 #define F_CPU		10000000UL
-#define MCUType		atmega328p
-#define MCUid		atmega328p
 
-#include <util/delay.h>
+#include <stdlib.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <avr/pgmspace.h>
+#include <util/delay.h>
 
 #include "uart.h"
 
-uart_t *uart1 = NULL;
+#define UART_BAUD_RATE      9600
 
 int main(void)
 {
-    
-	uart1 = uart_init("0", UART_BAUD_SELECT(9600, F_CPU));
-	uart_init_stdout(uart1);
+	uint8_t data[3] = {1, 2, 3};
+	
+	DDRB |= _BV(DDB0);
+	uart_init();
 	sei();
 	
-    while (1) 
-    {
-		uart_puts(uart1, "Hello\n");
+	while (1)
+	{
+		uart_send(data, 3);
+		PORTB ^= _BV(PORTB0);
 		_delay_ms(1000);
-    }
+	}
+	
+	return -1;
 }
 
