@@ -21,7 +21,6 @@ int main(void)
 {
 	uint8_t n;
 	char aux[5];
-	char msg[50];
 	
 	DDRB |= _BV(DDB0);
     uart_init(UART_BAUD_SELECT(UART_BAUD_RATE, F_CPU));
@@ -39,24 +38,23 @@ int main(void)
 		else
 		{
 			itoa(ds1307.date, aux, 10);
-			strcat(msg, aux);
-			strcat(msg, "/");
+			uart_puts(aux);
+			uart_puts("\\");
 			itoa(ds1307.month, aux, 10);
-			strcat(msg, aux);
-			strcat(msg, "/");
+			uart_puts(aux);
+			uart_puts("\\");
 			itoa(ds1307.year + 2000, aux, 10);
-			strcat(msg, aux);
-			strcat(msg, " ");
+			uart_puts(aux);
+			uart_puts(" ");
 			itoa(ds1307.hours, aux, 10);
-			strcat(msg, aux);
-			strcat(msg, ":");
+			uart_puts(aux);
+			uart_puts(":");
 			itoa(ds1307.minutes, aux, 10);
-			strcat(msg, aux);
-			strcat(msg, ":");
+			uart_puts(aux);
+			uart_puts(":");
 			itoa(ds1307.seconds, aux, 10);
-			strcat(msg, aux);
-			strcat(msg, "\n");
-			uart_puts(msg);
+			uart_puts(aux);
+			uart_puts("\n");
 		}
 		
 		PORTB ^= _BV(PORTB0);
