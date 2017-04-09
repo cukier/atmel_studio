@@ -1,11 +1,17 @@
-#ifndef _SYS_H
-#define _SYS_H
+/*
+ * sys.h
+ *
+ * Created: 09/04/2017 09:57:07
+ *  Author: cuki
+ */ 
 
-#include <stdint.h>
-#include <stdbool.h>
-#include <avr/io.h>
 
-#define F_CPU 10000000UL
-#define BAUD 9600
+#ifndef SYS_H_
+#define SYS_H_
 
-#endif
+#define F_CPU				10000000UL
+#define UART_BAUD_RATE      9600
+
+
+
+#endif /* SYS_H_ */

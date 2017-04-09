@@ -5,8 +5,7 @@
 * Author : cuki
 */
 
-#define F_CPU		10000000UL
-
+#include "sys.h"
 #include <stdlib.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -14,7 +13,6 @@
 #include <util/delay.h>
 
 #include "uart.h"
-#define UART_BAUD_RATE      9600
 
 
 int main(void)
@@ -31,7 +29,7 @@ int main(void)
 	
 	while (1)
 	{		
-// 		uart_puts("Hello\n");
+ 		uart_puts("Hello\n");
 // 		uart_send(data, 3);
 		PORTB ^= _BV(PORTB0);
 		n = uart_get(rec, 3);
