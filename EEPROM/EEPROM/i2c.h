@@ -19,7 +19,7 @@ void TWISetPageSize(uint16_t pSize);
 void TWISetWordAddress(void);
 void TWIResetWordAddress(void);
 void TWISetAddress(uint8_t address);
-void TWIInit(uint8_t address);
+void TWIInit(void);
 uint8_t TWIWriteByte(uint16_t u16addr, uint8_t u8data);
 uint8_t TWIReadByte(uint16_t u16addr, uint8_t *u8data);
 uint8_t TWIReadData(uint16_t address, uint8_t *data, uint16_t size);

@@ -11,7 +11,7 @@
 #include <avr/io.h>
 
 uint16_t pageSize = 0;
-uint8_t addr = 0;
+uint8_t deviceAddress = 0;
 bool _16bitAddress = false;
 
 void TWISetPageSize(uint16_t pSize)
@@ -31,18 +31,18 @@ void TWIResetWordAddress(void)
 
 void TWISetAddress(uint8_t address)
 {
-	addr = address;
+	deviceAddress = address;
 	return;
 }
 
-void TWIInit(uint8_t address)
+void TWIInit(void)
 {
 	//set SCL to 100kHz
 	TWSR = 0x00;
 	TWBR = 0x2A;
 	//enable TWI
 	TWCR = (1 << TWEN);
-	addr = address;
+	deviceAddress = 0;
 	_16bitAddress = false;
 	pageSize = 64;
 	return;
@@ -110,7 +110,7 @@ uint8_t TWIWriteByte(uint16_t u16addr, uint8_t u8data)
 	if (TWIGetStatus() != 0x08)
 	return ERROR;
 	
-	TWIWrite(addr);
+	TWIWrite(deviceAddress);
 	
 	if (TWIGetStatus() != 0x18)
 	return ERROR;
@@ -154,7 +154,7 @@ uint8_t TWIReadByte(uint16_t u16addr, uint8_t *u8data)
 	if (TWIGetStatus() != 0x08)
 	return ERROR;
 	
-	TWIWrite(addr);
+	TWIWrite(deviceAddress);
 	
 	if (TWIGetStatus() != 0x18)
 	return ERROR;
@@ -186,7 +186,7 @@ uint8_t TWIReadByte(uint16_t u16addr, uint8_t *u8data)
 	return ERROR;
 	
 	//select devise and send read bit
-	TWIWrite((addr) | 1);
+	TWIWrite((deviceAddress) | 1);
 	
 	if (TWIGetStatus() != 0x40)
 	return ERROR;
@@ -207,7 +207,7 @@ uint8_t TWIReadData(uint16_t address, uint8_t *data, uint16_t size)
 	if (TWIGetStatus() != 0x08)
 	return ERROR;
 	
-	TWIWrite(addr);
+	TWIWrite(deviceAddress);
 	
 	if (TWIGetStatus() != 0x18)
 	return ERROR;
@@ -237,7 +237,7 @@ uint8_t TWIReadData(uint16_t address, uint8_t *data, uint16_t size)
 	if (TWIGetStatus() != 0x10)
 	return ERROR;
 	
-	TWIWrite((addr) | 1);
+	TWIWrite((deviceAddress) | 1);
 	
 	if (TWIGetStatus() != 0x40)
 	return ERROR;
@@ -296,7 +296,7 @@ uint8_t TWIWriteData(uint16_t address, uint8_t *data, uint16_t size)
 		if (TWIGetStatus() != 0x08)
 		return ERROR;
 		
-		TWIWrite(addr);
+		TWIWrite(deviceAddress);
 		
 		if (TWIGetStatus() != 0x18)
 		return ERROR;
@@ -361,7 +361,7 @@ uint8_t TWIWritePage(uint8_t page, uint8_t *u8data)
 	return ERROR;
 	
 	//select page start address and send A2 A1 A0 bits send write command
-	TWIWrite(((addr) | (u8paddr >> 3)) & (~1));
+	TWIWrite(((deviceAddress) | (u8paddr >> 3)) & (~1));
 	
 	if (TWIGetStatus() != 0x18)
 	return ERROR;
@@ -398,7 +398,7 @@ uint8_t TWIReadePage(uint8_t page, uint8_t *u8data)
 	return ERROR;
 	
 	//select page start address and send A2 A1 A0 bits send write command
-	TWIWrite(((addr) | (u8paddr >> 3)) & (~1));
+	TWIWrite(((deviceAddress) | (u8paddr >> 3)) & (~1));
 	
 	if (TWIGetStatus() != 0x18)
 	return ERROR;
@@ -416,7 +416,7 @@ uint8_t TWIReadePage(uint8_t page, uint8_t *u8data)
 	return ERROR;
 	
 	//select devise and send read bit
-	TWIWrite(((addr) | (u8paddr >> 3)) | 1);
+	TWIWrite(((deviceAddress) | (u8paddr >> 3)) | 1);
 	
 	if (TWIGetStatus() != 0x40)
 	return ERROR;

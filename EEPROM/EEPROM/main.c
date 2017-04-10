@@ -22,23 +22,37 @@ int main(void)
 	uint8_t dataR[TEST_SIZE] = {0};
 	char aux[5];
 	uint16_t cont;
+	uint8_t r;
+	
+	r = ERROR;
 	
 	for (cont = 0; cont < TEST_SIZE; ++cont)
 	{
 		dataW[cont] = (uint8_t) cont;
 	}
 	
+	TWIInit();
 	TWISetWordAddress();
-	TWIInit(0xA0);
+	TWISetAddress(0xA0);
 	uart_init(UART_BAUD_SELECT(UART_BAUD_RATE, F_CPU));
 	sei();
 	_delay_ms(300);
+// 	TWIReadData(0, data, TEST_SIZE);
+// 	TWIWriteData(0, dataW, TEST_SIZE);
 	
 	while (1)
 	{
-		TWIReadData(0, data, TEST_SIZE);
-		TWIWriteData(0, dataW, TEST_SIZE);
-		TWIReadData(0, dataR, TEST_SIZE);
+		r = SUCCESS;
+		r = TWIReadData(0, dataR, TEST_SIZE);
+		
+		if (r == SUCCESS)
+		{
+			uart_puts("Leitura ok\n\r");
+		}
+		else
+		{
+			uart_puts("Leitura no ok\n\r");
+		}
 		
 		for (cont = 0; cont < TEST_SIZE; ++cont)
 		{
@@ -53,7 +67,7 @@ int main(void)
 			uart_puts(" ");
 			itoa(dataW[cont], aux, 16);
 			uart_puts(aux);
-			uart_puts("\n");
+			uart_puts("\n\r");
 		}
 		_delay_ms(1000);
 	}
