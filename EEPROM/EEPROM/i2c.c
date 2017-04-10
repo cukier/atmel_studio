@@ -10,7 +10,24 @@
 #include "i2c.h"
 #include <avr/io.h>
 
+uint16_t pageSize = 0;
 uint8_t addr = 0;
+bool _16bitAddress = false;
+
+void TWISetPageSize(uint16_t pSize)
+{
+	pageSize = pSize;
+}
+
+void TWISetWordAddress(void)
+{
+	_16bitAddress = true;
+}
+
+void TWIResetWordAddress(void)
+{
+	_16bitAddress = false;
+}
 
 void TWISetAddress(uint8_t address)
 {
@@ -26,6 +43,8 @@ void TWIInit(uint8_t address)
 	//enable TWI
 	TWCR = (1 << TWEN);
 	addr = address;
+	_16bitAddress = false;
+	pageSize = 64;
 	return;
 }
 
@@ -91,17 +110,31 @@ uint8_t TWIWriteByte(uint16_t u16addr, uint8_t u8data)
 	if (TWIGetStatus() != 0x08)
 	return ERROR;
 	
-	//select devise and send A2 A1 A0 address bits
-	TWIWrite((addr) | (uint8_t) ((u16addr & 0x0700) >> 7));
+	TWIWrite(addr);
 	
 	if (TWIGetStatus() != 0x18)
 	return ERROR;
 	
-	//send the rest of address
-	TWIWrite((uint8_t)(u16addr));
-	
-	if (TWIGetStatus() != 0x28)
-	return ERROR;
+	if (_16bitAddress)
+	{
+		TWIWrite((uint8_t)((u16addr & 0xFF00) >> 8));
+		
+		if (TWIGetStatus() != 0x28)
+		return ERROR;
+		
+		TWIWrite((uint8_t)u16addr);
+		
+		if (TWIGetStatus() != 0x28)
+		return ERROR;
+	}
+	else
+	{
+		TWIWrite((uint8_t)(u16addr));
+		
+		if (TWIGetStatus() != 0x28)
+		return ERROR;
+	}
+
 	
 	//write byte to eeprom
 	TWIWrite(u8data);
@@ -121,17 +154,30 @@ uint8_t TWIReadByte(uint16_t u16addr, uint8_t *u8data)
 	if (TWIGetStatus() != 0x08)
 	return ERROR;
 	
-	//select devise and send A2 A1 A0 address bits
-	TWIWrite((addr) | ((uint8_t) ((u16addr & 0x0700) >> 7)));
+	TWIWrite(addr);
 	
 	if (TWIGetStatus() != 0x18)
 	return ERROR;
 	
-	//send the rest of address
-	TWIWrite((uint8_t)(u16addr));
-	
-	if (TWIGetStatus() != 0x28)
-	return ERROR;
+	if (_16bitAddress)
+	{
+		TWIWrite((uint8_t)((u16addr & 0xFF00) >> 8));
+		
+		if (TWIGetStatus() != 0x28)
+		return ERROR;
+		
+		TWIWrite((uint8_t)u16addr);
+		
+		if (TWIGetStatus() != 0x28)
+		return ERROR;
+	}
+	else
+	{
+		TWIWrite((uint8_t)(u16addr));
+		
+		if (TWIGetStatus() != 0x28)
+		return ERROR;
+	}
 	
 	//send start
 	TWIStart();
@@ -140,7 +186,7 @@ uint8_t TWIReadByte(uint16_t u16addr, uint8_t *u8data)
 	return ERROR;
 	
 	//select devise and send read bit
-	TWIWrite((addr) | ((uint8_t)((u16addr & 0x0700) >> 7)) | 1);
+	TWIWrite((addr) | 1);
 	
 	if (TWIGetStatus() != 0x40)
 	return ERROR;
@@ -151,6 +197,154 @@ uint8_t TWIReadByte(uint16_t u16addr, uint8_t *u8data)
 	return ERROR;
 	
 	TWIStop();
+	return SUCCESS;
+}
+
+uint8_t TWIReadData(uint16_t address, uint8_t *data, uint16_t size)
+{
+	TWIStart();
+	
+	if (TWIGetStatus() != 0x08)
+	return ERROR;
+	
+	TWIWrite(addr);
+	
+	if (TWIGetStatus() != 0x18)
+	return ERROR;
+	
+	if (_16bitAddress)
+	{
+		TWIWrite((uint8_t)((address & 0xFF00) >> 8));
+		
+		if (TWIGetStatus() != 0x28)
+		return ERROR;
+		
+		TWIWrite((uint8_t)address);
+		
+		if (TWIGetStatus() != 0x28)
+		return ERROR;
+	}
+	else
+	{
+		TWIWrite((uint8_t)(address));
+		
+		if (TWIGetStatus() != 0x28)
+		return ERROR;
+	}
+	
+	TWIStart();
+	
+	if (TWIGetStatus() != 0x10)
+	return ERROR;
+	
+	TWIWrite((addr) | 1);
+	
+	if (TWIGetStatus() != 0x40)
+	return ERROR;
+	
+	--size;
+	
+	while(size--)
+	{
+		*data++ = TWIReadACK();
+		
+		if (TWIGetStatus() != 0x50)
+		return ERROR;
+	}
+	
+	*data = TWIReadNACK();
+	
+	if (TWIGetStatus() != 0x58)
+	return ERROR;
+	
+	TWIStop();
+	return SUCCESS;
+}
+
+uint8_t TWIWriteData(uint16_t address, uint8_t *data, uint16_t size)
+{
+	uint8_t buffer[pageSize], err;
+	uint16_t cont, acum, end, block_addr, offset;
+	
+	if (size > pageSize)
+	{
+		end = pageSize;
+	}
+	else
+	{
+		end = size;
+	}
+	
+	acum = 0;
+	block_addr = ((uint16_t) (address / pageSize)) * pageSize;
+	offset = address - block_addr;
+	
+	do
+	{
+		err = TWIReadData(block_addr, buffer, pageSize);
+		
+		if (err == ERROR)
+		return ERROR;
+		
+		for (cont = 0; cont < end; ++cont)
+		{
+			buffer[cont + offset] = data[cont + acum];
+		}
+		
+		TWIStart();
+		
+		if (TWIGetStatus() != 0x08)
+		return ERROR;
+		
+		TWIWrite(addr);
+		
+		if (TWIGetStatus() != 0x18)
+		return ERROR;
+		
+		if (_16bitAddress)
+		{
+			TWIWrite((uint8_t)((address & 0xFF00) >> 8));
+			
+			if (TWIGetStatus() != 0x28)
+			return ERROR;
+			
+			TWIWrite((uint8_t)address);
+			
+			if (TWIGetStatus() != 0x28)
+			return ERROR;
+		}
+		else
+		{
+			TWIWrite((uint8_t)(address));
+			
+			if (TWIGetStatus() != 0x28)
+			return ERROR;
+		}
+		
+		for (cont = 0; cont < pageSize; ++cont)
+		{
+			TWIWrite(buffer[cont]);
+			
+			if (TWIGetStatus() != 0x28)
+			return ERROR;
+		}
+		
+		TWIStop();
+		acum += end - offset;
+		
+		if (size > (acum + pageSize))
+		{
+			end = pageSize;
+		}
+		else
+		{
+			end = size - acum;
+		}
+		
+		block_addr += pageSize;
+		offset = 0;
+	} while (acum < size);
+	
 	return SUCCESS;
 }
 
