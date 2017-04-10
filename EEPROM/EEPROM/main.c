@@ -6,6 +6,7 @@
 */
 
 #include "sys.h"
+#include "eeprom.h"
 #include "i2c.h"
 #include "uart.h"
 #include <avr/io.h>
@@ -17,9 +18,9 @@
 
 int main(void)
 {
-	uint8_t data[TEST_SIZE] = {0};
-	uint8_t dataW[TEST_SIZE] = {0};
-	uint8_t dataR[TEST_SIZE] = {0};
+	uint16_t data[TEST_SIZE] = {0};
+	uint16_t dataW[TEST_SIZE] = {0};
+	uint16_t dataR[TEST_SIZE] = {0};
 	char aux[5];
 	uint16_t cont;
 	uint8_t r;
@@ -28,12 +29,11 @@ int main(void)
 	
 	for (cont = 0; cont < TEST_SIZE; ++cont)
 	{
-		dataW[cont] = (uint8_t) cont;
+		dataW[cont] = cont;
 	}
 	
+	eeprom_init();
 	TWIInit();
-	TWISetWordAddress();
-	TWISetAddress(0xA0);
 	uart_init(UART_BAUD_SELECT(UART_BAUD_RATE, F_CPU));
 	sei();
 	_delay_ms(300);
@@ -41,8 +41,8 @@ int main(void)
 	while (1)
 	{
 		r = ERROR;
-		TWIReadData(0, data, TEST_SIZE);
-		r = TWIWriteData(0, dataW, TEST_SIZE);
+		eeprom_read_data(0, data, TEST_SIZE);
+		r = eeprom_write_data(0, dataW, TEST_SIZE);
 		
 		if (r == SUCCESS)
 		{
@@ -54,7 +54,7 @@ int main(void)
 		}
 		
 		r = ERROR;
-		r = TWIReadData(0, dataR, TEST_SIZE);
+		r = eeprom_read_data(0, dataR, TEST_SIZE);
 		
 		if (r == SUCCESS)
 		{
