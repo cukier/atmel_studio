@@ -11,6 +11,8 @@
 #include "eeprom.h"
 #include <stdlib.h>
 
+#define MB_MAX_SIZE eeprom_get_size()
+
 typedef enum modbus_command_exception_code {
 	EXCEPTION_CODE_0,
 	EXCEPTION_CODE_1,
@@ -130,14 +132,19 @@ uint16_t CRC16(uint8_t *nData, uint16_t wLength) {
 }
 
 bool send_modbus(uint8_t *data, uint16_t i_size) {
-	bool ret = false;
-	ret = uart_send(data, i_size);
-	return ret;
+	uart_send(data, i_size);
+	return true;
 }
 
 uint8_t check_CRC(uint8_t *resp, modbus_command_t command) {
-	uint8_t *arr;
 	uint16_t ar_size, crc_check, crc_in, cont;
+	uint8_t *arr;
+	
+	ar_size = 0;
+	crc_check = 0;
+	crc_in = 0;
+	cont = 0;
+	arr = NULL;
 
 	switch (command) {
 		case READ_HOLDING_REGISTERS_COMMAND:
@@ -153,7 +160,6 @@ uint8_t check_CRC(uint8_t *resp, modbus_command_t command) {
 		break;
 	}
 
-	arr = NULL;
 	arr = (uint8_t *) malloc((size_t) (ar_size * sizeof(uint8_t)));
 
 	if (arr == NULL) {
@@ -162,8 +168,10 @@ uint8_t check_CRC(uint8_t *resp, modbus_command_t command) {
 	}
 
 	for (cont = 0; cont < ar_size; ++cont)
-	arr[cont] = resp[cont];
-
+	{
+		arr[cont] = resp[cont];
+	}
+	
 	crc_in = make16(resp[ar_size + 1], resp[ar_size]);
 	crc_check = CRC16(arr, ar_size);
 	free(arr);
@@ -194,10 +202,16 @@ modbus_command_exception_code_t error) {
 	}
 
 	#ifdef ADDR_MY
-	resp[0] = (uint8_t) TWIReadByte(ADDR_MY);
+	{
+		eeprom_read_word(ADDR_MY, &aux);
+		resp[0] = (uint8_t) aux;
+	}
 	#else
-	resp[0] = address;
+	{
+		resp[0] = address;
+	}
 	#endif
+	
 	resp[1] = ex_code;
 	resp[2] = error;
 	crc = CRC16(resp, 3);
@@ -207,4 +221,115 @@ modbus_command_exception_code_t error) {
 	send_modbus(resp, 5);
 
 	return true;
+}
+
+bool slave_response(void) {
+	uint8_t my_address, response[256], request[256], tmp_var[2];
+	uint16_t register_value, register_address, b_count, cont,
+	request_crc, aux_addr, index_rda, n, my_crc;
+	bool ret, respond_now;
+
+	ret = false;
+	respond_now = false;
+	n = 0;
+	n = uart_get(request, 256);
+
+	if (n != 0) {
+		index_rda = n;
+		respond_now = true;
+		#ifdef MODBUS_SLV_ADDR
+		{
+			my_address = MODBUS_SLV_ADDR;
+		}
+		#else
+		{
+			my_address = 1;
+		}
+		#endif
+	}
+
+	if (respond_now) {
+		respond_now = false;
+		register_value = (request[MODBUS_FIELDS_REGISTER_VALUE_H] << 8) |
+		request[MODBUS_FIELDS_REGISTER_VALUE_L];
+		register_address = (request[MODBUS_FIELDS_REGISTER_ADDRESS_H] << 8) |
+		request[MODBUS_FIELDS_REGISTER_ADDRESS_L];
+		b_count = request[MODBUS_FIELDS_BYTE_COUNT];
+		aux_addr = 2 * register_address;
+		request_crc = ((request[index_rda - 1] << 8) | (request[index_rda - 2]));
+		my_crc = CRC16(request, index_rda - 2);
+
+		if ((my_address == request[MODBUS_FIELDS_ADDRESS])
+		&& my_crc == request_crc) {
+			switch (request[MODBUS_FIELDS_FUNCTION]) {
+				case READ_HOLDING_REGISTERS_COMMAND:
+				if (register_value == 0 || register_value > 0x7D) {
+					ret = return_error(my_address, READ_HOLDING_REGISTERS_COMMAND,
+					EXCEPTION_CODE_3);
+				} else if (((register_value + register_address) * 2)
+				> (uint32_t) MB_MAX_SIZE) {
+					ret = return_error(my_address, READ_HOLDING_REGISTERS_COMMAND,
+					EXCEPTION_CODE_2);
+					} else if (!eeprom_ready()) {
+					ret = return_error(my_address, READ_HOLDING_REGISTERS_COMMAND,
+					EXCEPTION_CODE_0);
+					} else {
+					b_count = 2 * register_value;
+					response[0] = my_address;
+					response[1] = READ_HOLDING_REGISTERS_COMMAND;
+					response[2] = (uint8_t) b_count;
+					eeprom_read_data(aux_addr, &response[3], b_count);
+					request_crc = CRC16(response, b_count + 3);
+					response[b_count + 3] = (uint8_t) (request_crc & 0xFF);
+					response[b_count + 4] = (uint8_t) ((request_crc & 0xFF00) >> 8);
+					ret = send_modbus(response, b_count + 5);
+				}
+				break;
+
+				case WRITE_SINGLE_REGISTER_COMMAND:
+				if (((register_address + 1) * 2) > (uint32_t) MB_MAX_SIZE) {
+					ret = return_error(my_address, WRITE_SINGLE_REGISTER_COMMAND,
+					EXCEPTION_CODE_2);
+					} else if (!eeprom_ready()) {
+					ret = return_error(my_address, READ_HOLDING_REGISTERS_COMMAND,
+					EXCEPTION_CODE_0);
+					} else {
+					tmp_var[0] = (uint8_t) ((register_value & 0xFF00) >> 8);
+					tmp_var[1] = (uint8_t) (register_value & 0xFF);
+					eeprom_write_data(aux_addr, tmp_var, 2);
+
+					for (cont = 0; cont < index_rda; ++cont) {
+						response[cont] = request[cont];
+					}
+
+					ret = send_modbus(response, index_rda);
+				}
+				break;
+
+				case WRITE_MULTIPLE_REGISTERS_COMMAND:
+				if (((register_address * 2) + b_count) > (uint32_t) MB_MAX_SIZE) {
+					ret = return_error(my_address, WRITE_SINGLE_REGISTER_COMMAND,
+					EXCEPTION_CODE_2);
+					} else if (!eeprom_ready()) {
+					ret = return_error(my_address, READ_HOLDING_REGISTERS_COMMAND,
+					EXCEPTION_CODE_0);
+					} else {
+					eeprom_write_data(aux_addr, &request[7], b_count);
+					response[0] = my_address;
+					response[1] = WRITE_MULTIPLE_REGISTERS_COMMAND;
+					response[2] = (uint8_t) ((register_address & 0xFF00) >> 8);
+					response[3] = (uint8_t) (register_address & 0xFF);
+					response[4] = (uint8_t) ((register_value & 0xFF00) >> 8);
+					response[5] = (uint8_t) (register_value & 0xFF);
+					request_crc = CRC16(response, 6);
+					response[6] = (uint8_t) ((request_crc & 0xFF00) >> 8);
+					response[7] = (uint8_t) (request_crc & 0xFF);
+					ret = send_modbus(response, 8);
+				}
+				break;
+			}
+		}
+	}
+
+	return ret;
 }

@@ -9,6 +9,8 @@
 #ifndef MODBUS_H_
 #define MODBUS_H_
 
+#define MODBUS_SLV_ADDR	1
+
 #include <avr/io.h>
 #include <stdint.h>
 #include <stdbool.h>
