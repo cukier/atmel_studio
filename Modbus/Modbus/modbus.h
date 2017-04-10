@@ -16,5 +16,6 @@
 #include <stdbool.h>
 #include "sys.h"
 
+bool slave_response(void);
 
 #endif /* MODBUS_H_ */

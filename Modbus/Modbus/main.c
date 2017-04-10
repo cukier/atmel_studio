@@ -16,13 +16,17 @@
 #include <stdlib.h>
 
 int main(void)
-{
-	
+{	
 	uart_init(UART_BAUD_SELECT(UART_BAUD_RATE, F_CPU));
+	TWIInit();
+	eeprom_init();
+	sei();
+	_delay_ms(300);
 	
 	while (1)
 	{
-		
+		slave_response();
+		_delay_ms(100);
 	}
 	
 	return 0;

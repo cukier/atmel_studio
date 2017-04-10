@@ -569,6 +569,13 @@ void uart_puts(const char *s )
 
 }/* uart_puts */
 
+
+/*************************************************************************
+Function: uart_send()
+Purpose:  transmit array of data (uint8_t) to UART
+Input:    array pointer to the first data and size of the array
+Returns:  none
+**************************************************************************/
 void uart_send(uint8_t *data, uint16_t size) {
 	uint16_t cont;
 	
@@ -580,7 +587,7 @@ void uart_send(uint8_t *data, uint16_t size) {
 	}
 	
 	return;
-}
+}/* uart_send */
 
 
 /*************************************************************************
