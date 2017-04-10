@@ -6,7 +6,16 @@
 */
 
 #include "modbus.h"
+#include "uart.h"
 #include <stdlib.h>
+
+typedef enum modbus_command_exception_code {
+	EXCEPTION_CODE_0,
+	EXCEPTION_CODE_1,
+	EXCEPTION_CODE_2,
+	EXCEPTION_CODE_3,
+	EXCEPTION_CODE_4
+} modbus_command_exception_code_t;
 
 typedef enum exceptions {
 	NO_EXCEPTION,
@@ -15,6 +24,16 @@ typedef enum exceptions {
 	CRC_EXCEPTION,
 	NO_SERIAL_PORT_EXCEPTION
 } exception_t;
+
+typedef enum modbus_fields {
+	MODBUS_FIELDS_ADDRESS,
+	MODBUS_FIELDS_FUNCTION,
+	MODBUS_FIELDS_REGISTER_ADDRESS_H,
+	MODBUS_FIELDS_REGISTER_ADDRESS_L,
+	MODBUS_FIELDS_REGISTER_VALUE_H,
+	MODBUS_FIELDS_REGISTER_VALUE_L,
+	MODBUS_FIELDS_BYTE_COUNT
+} modbus_fields_t;
 
 typedef enum modbus_commands {
 	NO_COMMAND,
@@ -108,6 +127,12 @@ uint16_t CRC16(uint8_t *nData, uint16_t wLength) {
 	return wCRCWord;
 }
 
+bool send_modbus(uint8_t *data, uint16_t i_size) {
+	bool ret = false;
+	ret = uart_send(data, i_size);
+	return ret;
+}
+
 uint8_t check_CRC(uint8_t *resp, modbus_command_t command) {
 	uint8_t *arr;
 	uint16_t ar_size, crc_check, crc_in, cont;
@@ -142,4 +167,42 @@ uint8_t check_CRC(uint8_t *resp, modbus_command_t command) {
 	free(arr);
 
 	return (uint8_t) (crc_check == crc_in);
+}
+
+bool return_error(uint8_t address, modbus_command_t command,
+modbus_command_exception_code_t error) {
+	uint8_t resp[5], ex_code;
+	uint16_t crc;
+
+	switch (command) {
+		case READ_HOLDING_REGISTERS_COMMAND:
+		ex_code = 0x83;
+		break;
+		case WRITE_SINGLE_REGISTER_COMMAND:
+		ex_code = 0x86;
+		break;
+		default:
+		case NO_COMMAND:
+		case READ_COILS_COMMAND:
+		case READ_DISCRETE_INPUT_COMMAND:
+		case READ_INPUT_REGISTERS_COMMAND:
+		case WRITE_SINGLE_COIL_COMMAND:
+		ex_code = 0;
+		break;
+	}
+
+	#ifdef ADDR_MY
+	resp[0] = (uint8_t) get_byte(ADDR_MY);
+	#else
+	resp[0] = address;
+	#endif
+	resp[1] = ex_code;
+	resp[2] = error;
+	crc = CRC16(resp, 3);
+	resp[3] = (uint8_t) ((crc & 0xFF00) >> 8);
+	resp[4] = (uint8_t) (crc & 0xFF);
+
+	send_modbus(resp, 5);
+
+	return true;
 }
