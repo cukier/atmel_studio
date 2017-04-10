@@ -7,6 +7,8 @@
 
 #include "modbus.h"
 #include "uart.h"
+#include "i2c.h"
+#include "eeprom.h"
 #include <stdlib.h>
 
 typedef enum modbus_command_exception_code {
@@ -192,7 +194,7 @@ modbus_command_exception_code_t error) {
 	}
 
 	#ifdef ADDR_MY
-	resp[0] = (uint8_t) get_byte(ADDR_MY);
+	resp[0] = (uint8_t) TWIReadByte(ADDR_MY);
 	#else
 	resp[0] = address;
 	#endif

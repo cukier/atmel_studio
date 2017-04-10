@@ -13,6 +13,7 @@
 #include <stdbool.h>
 #include "sys.h"
 
+uint8_t eeprom_read_word(uint16_t address, uint16_t *data);
 uint8_t eeprom_read_data(uint16_t address, uint16_t *data, uint16_t size);
 uint8_t eeprom_write_data(uint16_t address, uint16_t *data, uint16_t size);
 uint8_t eeprom_init(void);

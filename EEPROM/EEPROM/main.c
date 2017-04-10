@@ -22,10 +22,11 @@ int main(void)
 	uint16_t dataW[TEST_SIZE] = {0};
 	uint16_t dataR[TEST_SIZE] = {0};
 	char aux[5];
-	uint16_t cont;
+	uint16_t cont, val;
 	uint8_t r;
 	
 	r = ERROR;
+	val = 0;
 	
 	for (cont = 0; cont < TEST_SIZE; ++cont)
 	{
@@ -80,6 +81,12 @@ int main(void)
 			uart_puts(aux);
 			uart_puts("\n\r");
 		}
+		
+		eeprom_read_word(0x10, &val);
+		itoa(val, aux, 16);
+		uart_puts(aux);
+		uart_puts("\n\r");
+		
 		_delay_ms(1000);
 	}
 	

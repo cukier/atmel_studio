@@ -13,6 +13,22 @@ uint16_t eeprom_pageSize = 0;
 uint32_t eeprom_size = 0;
 bool eeprom_double_address = false;
 
+uint8_t eeprom_read_word(uint16_t address, uint16_t *data)
+{
+	uint16_t addr = address * 2;
+	
+	if ((addr + 2) >= eeprom_size)
+	{
+		return ERROR;
+	}
+	
+	TWISetAddress(eeprom_address);
+	TWISetPageSize(eeprom_pageSize);
+	TWISetWordAddress();
+	
+	return TWIReadData(addr, (uint8_t *) data, 2);
+}
+
 uint8_t eeprom_read_data(uint16_t address, uint16_t *data, uint16_t size)
 {
 	uint16_t addr = address * 2;
