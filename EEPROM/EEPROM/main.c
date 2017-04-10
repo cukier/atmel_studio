@@ -13,7 +13,7 @@
 #include <avr/interrupt.h>
 #include <stdlib.h>
 
-#define TEST_SIZE	10
+#define TEST_SIZE	128
 
 int main(void)
 {
