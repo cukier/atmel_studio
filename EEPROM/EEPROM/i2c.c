@@ -8,7 +8,9 @@
 */
 
 #include "i2c.h"
+#include "sys.h"
 #include <avr/io.h>
+#include <util/delay.h>
 
 uint16_t pageSize = 0;
 uint8_t deviceAddress = 0;
@@ -202,6 +204,7 @@ uint8_t TWIReadByte(uint16_t u16addr, uint8_t *u8data)
 
 uint8_t TWIReadData(uint16_t address, uint8_t *data, uint16_t size)
 {
+	_delay_ms(10);
 	TWIStart();
 	
 	if (TWIGetStatus() != 0x08)
@@ -265,6 +268,8 @@ uint8_t TWIWriteData(uint16_t address, uint8_t *data, uint16_t size)
 {
 	uint8_t buffer[pageSize], err;
 	uint16_t cont, acum, end, block_addr, offset;
+	
+	_delay_ms(10);
 	
 	if (size > pageSize)
 	{

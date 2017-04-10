@@ -37,12 +37,23 @@ int main(void)
 	uart_init(UART_BAUD_SELECT(UART_BAUD_RATE, F_CPU));
 	sei();
 	_delay_ms(300);
-// 	TWIReadData(0, data, TEST_SIZE);
-// 	TWIWriteData(0, dataW, TEST_SIZE);
 	
 	while (1)
 	{
-		r = SUCCESS;
+		r = ERROR;
+		TWIReadData(0, data, TEST_SIZE);
+		r = TWIWriteData(0, dataW, TEST_SIZE);
+		
+		if (r == SUCCESS)
+		{
+			uart_puts("Escrita ok\n\r");
+		}
+		else
+		{
+			uart_puts("Escrita no ok\n\r");
+		}
+		
+		r = ERROR;
 		r = TWIReadData(0, dataR, TEST_SIZE);
 		
 		if (r == SUCCESS)
