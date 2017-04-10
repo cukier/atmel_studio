@@ -9,7 +9,6 @@
 
 #include "i2c.h"
 #include "sys.h"
-#include "uart.h"
 #include <avr/io.h>
 #include <util/delay.h>
 
@@ -287,7 +286,6 @@ uint8_t TWIWriteData(uint16_t address, uint8_t *data, uint16_t size)
 	
 	do
 	{
-		uart_puts("1\n\r");
 		err = TWIReadData(block_addr, buffer, pageSize);
 		
 		if (err == ERROR)
