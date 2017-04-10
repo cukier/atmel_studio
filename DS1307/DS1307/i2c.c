@@ -48,6 +48,7 @@ void TWIInit(void)
 	deviceAddress = 0;
 	_16bitAddress = false;
 	pageSize = 64;
+	
 	return;
 }
 
