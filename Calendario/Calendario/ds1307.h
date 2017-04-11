@@ -12,6 +12,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "sys.h"
+
 #define DS1307_ADDRESS	0xD0
 
 typedef struct DS1307_str {

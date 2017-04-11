@@ -12,6 +12,4 @@
 #define F_CPU				10000000UL
 #define UART_BAUD_RATE      9600
 
-
-
 #endif /* SYS_H_ */

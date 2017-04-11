@@ -8,6 +8,7 @@
 #include "ds1307.h"
 #include "i2c.h"
 #include <stdio.h>
+#include <util/delay.h>
 
 uint8_t DS1307_getSeconds(uint8_t *seconds) {
 	return TWIReadByte(0x00, seconds);
@@ -39,6 +40,10 @@ uint8_t DS1307_getYear(uint8_t *year) {
 
 uint8_t DS1307_get(DS1307_t *ds1307) {
 	uint8_t val = 0;
+	
+	TWISetAddress(DS1307_ADDRESS);
+	TWIResetWordAddress();
+	_delay_ms(10);
 	
 	if (DS1307_getSeconds(&val) == ERROR)
 	return ERROR;
