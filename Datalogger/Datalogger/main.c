@@ -49,8 +49,8 @@ void atuliza_horario(uint16_t nr_registro)
 	arr[3] = ds1307.hours;
 	arr[4] = ds1307.minutes;
 	arr[5] = ds1307.seconds;
-	arr[6] = (uint8_t) ((nr_registro & 0xFF00) >> 8);
-	arr[7] = (uint8_t) (nr_registro & 0xFF);
+	arr[6] = (uint8_t) (nr_registro & 0xFF);
+	arr[7] = (uint8_t) ((nr_registro & 0xFF00) >> 8);
 	
 	eeprom_write_data(0, arr, 8);
 	_delay_ms(10);
@@ -64,13 +64,22 @@ int main(void)
 	uint16_t leit, ad, ult_leit;
 	
 	sec = 0;
-	ad = 1;
+	ad = 0;
 	leit = 0;
 	ult_leit = 0;
 	
+	_delay_ms(500);
 	uart_init(UART_BAUD_SELECT(UART_BAUD_RATE, F_CPU));
 	TWIInit();
 	eeprom_init();
+	_delay_ms(500);
+	
+	eeprom_read_word(3, &ad);
+	
+	if (ad == UINT16_MAX || ad == 0)
+	{
+		ad = 1;
+	}
 	
 	while (1)
 	{
@@ -94,7 +103,8 @@ int main(void)
 				}
 			}
 		}
-		_delay_ms(10);
+		
+		_delay_ms(500);
 	}
 	
 	return -1;

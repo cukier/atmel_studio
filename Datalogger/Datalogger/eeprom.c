@@ -41,6 +41,20 @@ uint8_t eeprom_write_data(uint16_t address, uint8_t *data, uint16_t size)
 	return TWIWriteData(address, data, size);
 }
 
+uint8_t eeprom_read_byte(uint16_t address, uint8_t *data)
+{	
+	if ((address + 1) >= eeprom_size)
+	{
+		return ERROR;
+	}
+	
+	TWISetAddress(eeprom_address);
+	TWISetPageSize(eeprom_pageSize);
+	TWISetWordAddress();
+	
+	return TWIReadByte(address, data);
+}
+
 uint8_t eeprom_read_word(uint16_t address, uint16_t *data)
 {
 	uint16_t addr = address * 2;
