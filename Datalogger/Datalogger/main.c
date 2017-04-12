@@ -61,11 +61,12 @@ void atuliza_horario(uint16_t nr_registro)
 int main(void)
 {
 	uint8_t sec;
-	uint16_t cont, ad;
+	uint16_t leit, ad, ult_leit;
 	
 	sec = 0;
 	ad = 1;
-	cont = 0;
+	leit = 0;
+	ult_leit = 0;
 	
 	uart_init(UART_BAUD_SELECT(UART_BAUD_RATE, F_CPU));
 	TWIInit();
@@ -78,13 +79,19 @@ int main(void)
 		if (sec != ds1307.seconds)
 		{
 			sec = ds1307.seconds;
-			registrar(cont++, ds1307, ad);
-			atuliza_horario(ad);
-			ad++;
+			leit = ADCsingleREAD(0);
 			
-			if (ad >= eeprom_get_size())
+			if (leit != ult_leit)
 			{
-				ad %= eeprom_get_size();
+				ult_leit = leit;
+				registrar(leit, ds1307, ad);
+				atuliza_horario(ad);
+				ad++;
+				
+				if (ad >= eeprom_get_size())
+				{
+					ad %= eeprom_get_size();
+				}
 			}
 		}
 		_delay_ms(10);
