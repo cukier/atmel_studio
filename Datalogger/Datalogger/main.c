@@ -23,20 +23,18 @@ uint16_t ADCsingleREAD(uint8_t adctouse)
 {
 	uint16_t ADCval;
 
-	ADMUX = adctouse;         // use #1 ADC
-	ADMUX |= (1 << REFS0);    // use AVcc as the reference
-	ADMUX &= ~(1 << ADLAR);   // clear for 10 bit resolution
+	ADMUX = adctouse;
+	ADMUX |= (1 << REFS0);
+	ADMUX &= ~(1 << ADLAR);
+	ADCSRA |= (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);
+	ADCSRA |= (1 << ADEN);
+	ADCSRA |= (1 << ADSC);
 	
-	ADCSRA |= (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);    // 128 prescale for 8Mhz
-	ADCSRA |= (1 << ADEN);    // Enable the ADC
-
-	ADCSRA |= (1 << ADSC);    // Start the ADC conversion
-
-	while(ADCSRA & (1 << ADSC));      // Thanks T, this line waits for the ADC to finish
-
-
+	while(ADCSRA & (1 << ADSC));
+	
 	ADCval = ADCL;
-	ADCval = (ADCH << 8) + ADCval;    // ADCH is read so ADC can be updated again
+	ADCval = (ADCH << 8) + ADCval;
+	_delay_ms(10);
 
 	return ADCval;
 }
