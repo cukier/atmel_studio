@@ -17,30 +17,52 @@
 #include <stdlib.h>
 #include <string.h>
 
-DS1307_t ds1307;
+typedef struct reg_str {
+	uint8_t hora;
+	uint8_t minuto;
+	uint8_t segundo;
+	uint8_t dia;
+	uint8_t mes;
+	uint8_t ano;
+	uint8_t high;
+	uint8_t low;
+} reg_t;
 
-uint8_t write_cal(uint16_t i_addr, uint16_t info)
+DS1307_t ds1307;
+reg_t registro;
+
+uint8_t write_cal(uint16_t info, uint16_t index)
 {
-	uint8_t arr_size = sizeof(DS1307_t) + 2;
+	uint8_t arr_size = sizeof(reg_t);
+	uint8_t arr_index[2];
 	uint8_t arr[arr_size];
 	
-	TWIWriteByte(0, (uint8_t) ((i_addr & 0xFF00) >> 8));
-	TWIWriteByte(1, (uint8_t) (i_addr & 0xFF));
+	registro.hora = ds1307.hours;
+	registro.minuto = ds1307.minutes;
+	registro.segundo = ds1307.seconds;
+	registro.dia = ds1307.date;
+	registro.mes = ds1307.month;
+	registro.ano = ds1307.year;
+	registro.high = (uint8_t) ((info & 0xFF00) >> 8);
+	registro.low = (uint8_t) (info & 0xFF);
+	arr_index[0] = (uint8_t) ((index & 0xFF00) >> 8);
+	arr_index[1] = (uint8_t) (index & 0xFF);
 	
 	memcpy(arr, &ds1307, arr_size);
-	arr[arr_size - 2] = (uint8_t) ((info & 0xFF00) >> 8);
-	arr[arr_size - 1] = (uint8_t) (info & 0xFF);
-	eeprom_write_data(i_addr + 2, arr, arr_size);
+	eeprom_write_data(index + 2, arr, arr_size);
+	_delay_ms(10);
+	eeprom_write_data(0, arr_index, 2);
 	
 	return arr_size;
 }
 
 int main(void)
-{	
-	uint16_t cont, index;
+{
+	uint16_t m_index;
+	uint16_t cont;
 	
- 	cont = 0;
- 	index = 0;
+	m_index = 0;
+	cont = 0;
 	
 	uart_init(UART_BAUD_SELECT(UART_BAUD_RATE, F_CPU));
 	TWIInit();
@@ -51,7 +73,8 @@ int main(void)
 	while (1)
 	{
 		DS1307_get(&ds1307);
-		index += write_cal(index, cont++);
+		m_index += write_cal(cont++, m_index);
+		m_index %= eeprom_get_size();
 		slave_response();
 		_delay_ms(1000);
 	}
