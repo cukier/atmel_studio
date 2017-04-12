@@ -13,8 +13,9 @@
 #include "modbus.h"
 #include "registro.h"
 
-#include <avr/io.h>
 #include <string.h>
+#include <avr/io.h>
+#include <avr/interrupt.h>
 #include <util/delay.h>
 
 DS1307_t ds1307 = {0};
@@ -62,6 +63,7 @@ int main(void)
 {
 	uint8_t sec;
 	uint16_t leit, ad, ult_leit;
+	char txt[16];
 	
 	sec = 0;
 	ad = 0;
@@ -72,7 +74,13 @@ int main(void)
 	uart_init(UART_BAUD_SELECT(UART_BAUD_RATE, F_CPU));
 	TWIInit();
 	eeprom_init();
+	sei();
 	_delay_ms(500);
+	
+	strcpy(txt, "\fHello");
+	uart_puts(txt);
+	strcpy(txt, "\rWorld");
+	uart_puts(txt);
 	
 	eeprom_read_word(3, &ad);
 	
@@ -104,6 +112,7 @@ int main(void)
 			}
 		}
 		
+		slave_response();
 		_delay_ms(500);
 	}
 	
