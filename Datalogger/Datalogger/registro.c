@@ -8,6 +8,17 @@
 #include "eeprom.h"
 #include <string.h>
 
+uint16_t swp(uint16_t val)
+{
+	uint16_t ret;
+	
+	ret = 0;
+	ret = (val & 0xFF00) >> 8;
+	ret |= (val & 0xFF) << 8;
+	
+	return ret;
+}
+
 uint8_t registrar(uint16_t val, DS1307_t cal, uint16_t index)
 {
 	reg_t registro = {0};
@@ -21,7 +32,7 @@ uint8_t registrar(uint16_t val, DS1307_t cal, uint16_t index)
 	registro.hora = cal.hours;
 	registro.minuto = cal.minutes;
 	registro.segundo = cal.seconds;
-	registro.dado = val;
+	registro.dado = swp(val);
 	
 	if (index + n >= eeprom_get_size())
 	{

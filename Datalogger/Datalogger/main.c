@@ -97,6 +97,7 @@ int main(void)
 		{
 			sec = ds1307.seconds;
 			leit = ADCsingleREAD(0);
+			registrar(ad - 1, ds1307, 0);
 			
 			if (leit != ult_leit)
 			{

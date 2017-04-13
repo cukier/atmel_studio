@@ -15,17 +15,24 @@ namespace Datalogger
         private static SerialPort port;
         private static ModbusSerialMaster mstr;
         private static long timestam1, timestamp2;
+        private static ushort pageSize;
+        private static ushort pageNumbers;
 
         static void Main(string[] args)
         {
+            ushort[] resp;
+            ushort m_page;
+
+            pageSize = 4;
+            pageNumbers = 1;
 
             port = new SerialPort();
-            port.PortName = "COM2";
-            port.BaudRate = 19200;
+            port.PortName = "COM10";
+            port.BaudRate = 9600;
             port.DataBits = 8;
             port.StopBits = StopBits.One;
             port.Parity = Parity.None;
-            port.ReadTimeout = 2000;
+            port.ReadTimeout = 500;
             port.WriteTimeout = 100;
 
             mstr = ModbusSerialMaster.CreateRtu(port);
@@ -37,21 +44,36 @@ namespace Datalogger
                     if (!port.IsOpen)
                     {
                         port.Open();
+                        Console.WriteLine("\n\nPorta Aberta");
                     }
 
-                    Console.WriteLine("\n\nPorta Aberta");
+                    
+                    timestam1 = 0;
+                    timestamp2 = 0;
+                    Console.WriteLine("Leitura do endereco 0");
+                    timestam1 = DateTime.Now.Millisecond;
+                    resp = mstr.ReadHoldingRegisters(1, 0, pageSize);
+                    timestamp2 = DateTime.Now.Millisecond;
+                    Console.WriteLine(GetCal(resp));
 
-                    for (ushort cont = 0; cont < 4; ++cont)
+                    m_page = resp[3];
+                    resp = null;
+                    Console.WriteLine("Leitura do endereco " + m_page.ToString());
+                    resp = mstr.ReadHoldingRegisters(1, (ushort) (m_page * pageSize), pageSize);
+                    Console.WriteLine(GetCal(resp));
+
+                    String str;
+
+                    if (timestamp2 >= timestam1)
                     {
-                        timestam1 = 0;
-                        timestamp2 = 0;
-                        Console.WriteLine("Leitura do endereco " + cont * 40);
-                        timestam1 = DateTime.Now.Millisecond;
-                        ushort[] resp = mstr.ReadHoldingRegisters(1, (ushort)(40 * cont), 40);
-                        timestamp2 = DateTime.Now.Millisecond;
-                        Console.WriteLine(string.Join(" ", resp));
-                        Console.WriteLine("Tempo: " + (timestamp2 - timestam1) + "ms");
+                        str = (timestamp2 - timestam1).ToString();
                     }
+                    else
+                    {
+                        str = ((timestamp2 + 1000) - timestam1).ToString();
+                    }
+
+                    Console.WriteLine("Tempo: " + str + "ms");
                 }
 
                 catch (Exception ex)
@@ -67,12 +89,35 @@ namespace Datalogger
                         Console.WriteLine("Porta Fechada");
                     }
                 }
+
+                //System.Threading.Thread.Sleep(5000);
             }
         }
 
-        private static String GetIndex(ushort[] arr)
+        private static ushort swp(ushort val)
         {
-            return ((byte)((arr[3] & 0xFF00) >> 8)).ToString();
+            int aux;
+
+            aux = 0;
+            aux = (val & 0xFF00) >> 8;
+            aux |= (val & 0xFF) << 8;
+
+            return (ushort)aux;
+        }
+
+        private static String GetCal(ushort[] arr)
+        {
+            String ret;
+
+            ret = ((arr[0] & 0xFF00) >> 8).ToString() + ":";
+            ret += (arr[0] & 0xFF).ToString() + ":";
+            ret += ((arr[1] & 0xFF00) >> 8).ToString() + " ";
+            ret += (arr[1] & 0xFF).ToString() + "/";
+            ret += ((arr[2] & 0xFF00) >> 8).ToString() + "/";
+            ret += (arr[2] & 0xFF).ToString() + " ";
+            ret += arr[3].ToString();
+
+            return ret;
         }
     }
 }
