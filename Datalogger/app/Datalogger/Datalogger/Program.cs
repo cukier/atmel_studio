@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
+using System.Diagnostics;
 
 namespace Datalogger
 {
@@ -14,10 +15,13 @@ namespace Datalogger
         private static Timer t1;
         private static SerialPort port;
         private static ModbusSerialMaster mstr;
-        private static bool open = false;
+        private static long timestam1, timestamp2;
+        private static bool onRun;
 
         static void Main(string[] args)
         {
+            onRun = false;
+
             port = new SerialPort();
             port.PortName = "COM2";
             port.BaudRate = 19200;
@@ -40,7 +44,7 @@ namespace Datalogger
 
         private static void SetTimer()
         {
-            t1 = new Timer(2000);
+            t1 = new Timer(10000);
             //t1.Elapsed += async (sender, e) => await HandleTimer();
             t1.Elapsed += OnTimedEvent;
             t1.Start();
@@ -63,17 +67,28 @@ namespace Datalogger
             //e.SignalTime);
             try
             {
-                if (!port.IsOpen)
+                if (!onRun)
                 {
-                    port.Open();
-                }
+                    onRun = true;
 
-                Console.WriteLine("Porta Aberta\n");
+                    if (!port.IsOpen)
+                    {
+                        port.Open();
+                    }
 
-                for (ushort cont = 0; cont < 4; ++cont)
-                {
-                    ushort[] resp = mstr.ReadHoldingRegisters(1, (ushort) (40 * cont), 40);
-                    Console.WriteLine(string.Join(" ", resp));
+                    Console.WriteLine("\n\nPorta Aberta");
+
+                    for (ushort cont = 0; cont < 4; ++cont)
+                    {
+                        Console.WriteLine("Leitura do endereco " + cont * 40);
+                        timestam1 = 0;
+                        timestam1 = DateTime.Now.Millisecond;
+                        ushort[] resp = mstr.ReadHoldingRegisters(1, (ushort)(40 * cont), 40);
+                        timestamp2 = 0;
+                        timestamp2 = DateTime.Now.Millisecond;
+                        Console.WriteLine(string.Join(" ", resp));
+                        Console.WriteLine("Tempo: " + (timestamp2 - timestam1) + "ms");
+                    }
                 }
             }
             catch (Exception ex)
@@ -85,7 +100,8 @@ namespace Datalogger
                 if (port.IsOpen)
                 {
                     port.Close();
-                    Console.WriteLine("Porta Fechada\n");
+                    Console.WriteLine("Porta Fechada");
+                    onRun = false;
                 }
             }
         }
