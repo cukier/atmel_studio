@@ -19,11 +19,12 @@ namespace Datalogger
         static void Main(string[] args)
         {
             port = new SerialPort();
-            port.PortName = "COM1";
-            port.BaudRate = 9600;
+            port.PortName = "COM2";
+            port.BaudRate = 19200;
             port.DataBits = 8;
             port.StopBits = StopBits.One;
             port.Parity = Parity.None;
+            port.ReadTimeout = 2000;
 
             mstr = ModbusSerialMaster.CreateRtu(port);
             SetTimer();
@@ -39,7 +40,7 @@ namespace Datalogger
 
         private static void SetTimer()
         {
-            t1 = new Timer(1000);
+            t1 = new Timer(2000);
             //t1.Elapsed += async (sender, e) => await HandleTimer();
             t1.Elapsed += OnTimedEvent;
             t1.Start();
@@ -51,33 +52,41 @@ namespace Datalogger
             throw new NotImplementedException();
         }
 
+        private static String GetIndex(ushort[] arr)
+        {
+            return ((byte)((arr[3] & 0xFF00) >> 8)).ToString();
+        }
+
         private static void OnTimedEvent(Object source, ElapsedEventArgs e)
         {
             //Console.WriteLine("The Elapsed event was raised at {0:HH:mm:ss.fff}",
             //e.SignalTime);
             try
             {
-                if (!open)
+                if (!port.IsOpen)
                 {
                     port.Open();
-                    open = true;
-                    Console.WriteLine("Porta Aberta\n");
-                    port.Close();
-                    open = false;
-                    Console.WriteLine("Porta Fechada\n");
                 }
-                
-                ushort[] resp = mstr.ReadHoldingRegisters(1, 0, 10);                
+
+                Console.WriteLine("Porta Aberta\n");
+
+                for (ushort cont = 0; cont < 4; ++cont)
+                {
+                    ushort[] resp = mstr.ReadHoldingRegisters(1, (ushort) (40 * cont), 40);
+                    Console.WriteLine(string.Join(" ", resp));
+                }
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
             }
             finally
-            {                
-                port.Close();
-                open = false;
-                Console.WriteLine("Porta Fechada\n");
+            {
+                if (port.IsOpen)
+                {
+                    port.Close();
+                    Console.WriteLine("Porta Fechada\n");
+                }
             }
         }
     }
