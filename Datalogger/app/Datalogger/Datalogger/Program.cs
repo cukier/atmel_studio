@@ -27,7 +27,7 @@ namespace Datalogger
             pageNumbers = 1;
 
             port = new SerialPort();
-            port.PortName = "COM10";
+            port.PortName = "COM1";
             port.BaudRate = 9600;
             port.DataBits = 8;
             port.StopBits = StopBits.One;
