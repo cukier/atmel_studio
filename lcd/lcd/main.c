@@ -24,7 +24,7 @@ int main(void)
 	
     while (1) 
     {
-		lcd_puts("Hello");
+		lcd_puts("Hola viteh :)\n");
 		_delay_ms(1000);
     }
 	
