@@ -16,15 +16,15 @@
 
 int main(void)
 {
-	uint8_t cont;
+	//uint8_t cont;
 	
-	cont = 0;
-    lcd_init();
-	lcd_on();
+	//cont = 0;
+    lcd_init(LCD_DISP_ON);
+	lcd_clrscr();
 	
     while (1) 
     {
-		lcd_printf("\fHello %u", cont++);
+		lcd_puts("Hello");
 		_delay_ms(1000);
     }
 	
