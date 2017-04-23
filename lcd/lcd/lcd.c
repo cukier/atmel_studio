@@ -2,6 +2,9 @@
 #include "lcd.h"
 
 #include <util/delay.h>
+#include <stdio.h>
+
+char lcd_buffer[17];
 
 void lcd_rs_set(void) {
 	RS_PORT |= _BV(RS);
@@ -113,6 +116,20 @@ void lcd_putc(char c) {
 		lcd_envia_byte(1, c);
 		break;
 	}
+	
+	return;
+}
+
+
+
+void lcd_printf(char *format, ...) {
+	va_list args;
+
+	va_start(args, format);
+	vsnprintf(lcd_buffer, 17, format, args);
+	va_end(args);
+
+	lcd_puts(lcd_buffer);
 	
 	return;
 }

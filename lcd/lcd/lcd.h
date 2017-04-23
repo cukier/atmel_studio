@@ -15,6 +15,7 @@
 #include <avr/io.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdarg.h>
 
 #define LCD_DDR		DDRB
 #define RS_DDR		DDRB
@@ -32,6 +33,7 @@
 void output_bit(uint8_t bit, bool value);
 void lcd_putc(char c);
 void lcd_puts(char *str);
+void lcd_printf(char *format, ...);
 void lcd_init();
 
 #endif //LCD_H
