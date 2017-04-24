@@ -20,15 +20,15 @@
 #define LCD_DDR		DDRB
 #define RS_DDR		DDRB
 #define EN_DDR		DDRB
-#define LCD_PORT	PORTB
-#define D4			PORTB0
-#define D5			PORTB1
-#define D6			PORTB2
-#define D7			PORTB3
-#define RS_PORT		PORTB
-#define RS			PORTB4
+#define LCD_PORT	PORTD
+#define D4			PORTD4
+#define D5			PORTD5
+#define D6			PORTD6
+#define D7			PORTD7
+#define RS_PORT		PORTD
+#define RS			PORTB7
 #define EN_PORT		PORTB
-#define EN			PORTB5
+#define EN			PORTB1
 
 void output_bit(uint8_t bit, bool value);
 void lcd_putc(char c);
