@@ -17,16 +17,16 @@
 #include <stdbool.h>
 #include <stdarg.h>
 
-#define LCD_DDR		DDRB
-#define RS_DDR		DDRB
-#define EN_DDR		DDRB
+#define LCD_DDR		DDRD
 #define LCD_PORT	PORTD
 #define D4			PORTD4
 #define D5			PORTD5
 #define D6			PORTD6
 #define D7			PORTD7
+#define RS_DDR		DDRB
 #define RS_PORT		PORTB
 #define RS			PORTB2
+#define EN_DDR		DDRB
 #define EN_PORT		PORTB
 #define EN			PORTB1
 

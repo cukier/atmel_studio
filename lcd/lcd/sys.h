@@ -9,6 +9,6 @@
 #ifndef SYS_H_
 #define SYS_H_
 
-#define F_CPU 10000000
+#define F_CPU 10000000ULL
 
 #endif /* SYS_H_ */
