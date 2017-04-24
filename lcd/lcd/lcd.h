@@ -25,8 +25,8 @@
 #define D5			PORTD5
 #define D6			PORTD6
 #define D7			PORTD7
-#define RS_PORT		PORTD
-#define RS			PORTB7
+#define RS_PORT		PORTB
+#define RS			PORTB2
 #define EN_PORT		PORTB
 #define EN			PORTB1
 
