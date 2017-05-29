@@ -18,6 +18,7 @@ int main(void)
 {
 	uint8_t c;
 	
+	DDRB |= _BV(DDB0);
 	c = 0;
 	lcd_init();
 	_delay_ms(100);
@@ -28,6 +29,7 @@ int main(void)
 	while (1)
 	{
 		lcd_printf("\fcount: %u", c++);
+		PORTB ^= _BV(PORTB0);
 		_delay_ms(500);
 	}
 	
