@@ -12,8 +12,8 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
-#define __DELAY		10
-#define __DELAY_H	10
+#define __DELAY		5
+#define __DELAY_H	5
 #define __DELAY_V	1
 #define _X_SIZE		8
 #define _Y_SIZE		5
@@ -75,6 +75,7 @@ void send(uint8_t c)
 	volatile uint8_t i;
 	
 	mask = 0;
+	clock_3();
 	
 	for (i = 0; i < _X_SIZE; ++i)
 	{
@@ -93,7 +94,22 @@ void send(uint8_t c)
 	}
 	
 	clock_2();
-	clock_3();
+	
+	return;
+}
+
+void put_c(uint8_t c)
+{
+	switch (c)
+	{
+		case 'A':
+		send(0b01111100);
+		send(0b10000010);
+		send(0b11111110);
+		send(0b10000010);
+		send(0b10000010);
+		break;		
+	}
 	
 	return;
 }
@@ -114,21 +130,23 @@ void init(void)
 	PORTB |= _BV(PORTB3);
 	PORTB &= ~_BV(PORTB4);
 	
+	clr();
+	clock_3();
+	clock_3();
+	clock_3();
+	//clock_3();
+	//clock_3();
+	
 	return;
 }
 
 int main(void)
 {
-	uint8_t cont;
-	
-	cont = 0;
 	init();
 	
 	while (1)
 	{
-		send(cont);
-		cont++;
-		_delay_ms(10);
+		put_c('A');
 	}
 	
 	return -1;
