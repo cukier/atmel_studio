@@ -6,10 +6,8 @@
 
 #define F_CPU				16000000ULL
 
-#define	PORT(x)				_port2(x)
-#define	DDR(x)				_ddr2(x)
-#define	_port2(x)			PORT ## x
-#define	_ddr2(x)			DDR ## x
+#define	PORT(x)				PORT ## x
+#define	DDR(x)				DDR ## x
 
 #define	RESET2(x,y)			PORT(x) &= ~(1<<y)
 #define	SET2(x,y)			PORT(x) |= (1<<y)
