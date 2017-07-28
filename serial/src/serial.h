@@ -23,13 +23,6 @@
 
 #include <util/setbaud.h>
 
-#ifndef loop_until_bit_is_set
-#define loop_until_bit_is_set(sfr,bit) do { } while (bit_is_clear(sfr, bit))
-#endif
-#ifndef _BV
-#define _BV(bit) (1 << (bit))
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 
