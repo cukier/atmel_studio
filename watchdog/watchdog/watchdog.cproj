@@ -12,72 +12,32 @@
     <OutputFileName>$(MSBuildProjectName)</OutputFileName>
     <OutputFileExtension>.elf</OutputFileExtension>
     <OutputDirectory>$(MSBuildProjectDirectory)\$(Configuration)</OutputDirectory>
-    <AssemblyName>Blink</AssemblyName>
-    <Name>Blink</Name>
-    <RootNamespace>Blink</RootNamespace>
+    <AssemblyName>watchdog</AssemblyName>
+    <Name>watchdog</Name>
+    <RootNamespace>watchdog</RootNamespace>
     <ToolchainFlavour>Native</ToolchainFlavour>
     <KeepTimersRunning>true</KeepTimersRunning>
     <OverrideVtor>false</OverrideVtor>
     <CacheFlash>true</CacheFlash>
     <ProgFlashFromRam>true</ProgFlashFromRam>
-    <RamSnippetAddress>0x20000000</RamSnippetAddress>
+    <RamSnippetAddress />
     <UncachedRange />
     <preserveEEPROM>true</preserveEEPROM>
-    <OverrideVtorValue>exception_table</OverrideVtorValue>
+    <OverrideVtorValue />
     <BootSegment>2</BootSegment>
     <eraseonlaunchrule>0</eraseonlaunchrule>
     <AsfFrameworkConfig>
       <framework-data xmlns="">
-        <options />
-        <configurations />
-        <files />
-        <documentation help="" />
-        <offline-documentation help="" />
-        <dependencies>
-          <content-extension eid="atmel.asf" uuidref="Atmel.ASF" version="3.31.0" />
-        </dependencies>
-      </framework-data>
+  <options />
+  <configurations />
+  <files />
+  <documentation help="" />
+  <offline-documentation help="" />
+  <dependencies>
+    <content-extension eid="atmel.asf" uuidref="Atmel.ASF" version="3.34.1" />
+  </dependencies>
+</framework-data>
     </AsfFrameworkConfig>
-    <avrtool>custom</avrtool>
-    <avrtoolserialnumber>
-    </avrtoolserialnumber>
-    <avrdeviceexpectedsignature>0x1E950F</avrdeviceexpectedsignature>
-    <com_atmel_avrdbg_tool_atmelice>
-      <ToolOptions>
-        <InterfaceProperties>
-          <IspClock>0</IspClock>
-        </InterfaceProperties>
-        <InterfaceName>ISP</InterfaceName>
-      </ToolOptions>
-      <ToolType>com.atmel.avrdbg.tool.atmelice</ToolType>
-      <ToolNumber>J41800041319</ToolNumber>
-      <ToolName>Atmel-ICE</ToolName>
-    </com_atmel_avrdbg_tool_atmelice>
-    <avrtoolinterface>ISP</avrtoolinterface>
-    <avrtoolinterfaceclock>0</avrtoolinterfaceclock>
-    <com_atmel_avrdbg_tool_simulator>
-      <ToolOptions xmlns="">
-        <InterfaceProperties>
-        </InterfaceProperties>
-        <InterfaceName>ISP</InterfaceName>
-      </ToolOptions>
-      <ToolType xmlns="">com.atmel.avrdbg.tool.simulator</ToolType>
-      <ToolNumber xmlns="">
-      </ToolNumber>
-      <ToolName xmlns="">Simulator</ToolName>
-    </com_atmel_avrdbg_tool_simulator>
-    <custom>
-      <ToolOptions xmlns="">
-        <InterfaceProperties>
-        </InterfaceProperties>
-        <InterfaceName>ISP</InterfaceName>
-      </ToolOptions>
-      <ToolType xmlns="">custom</ToolType>
-      <ToolNumber xmlns="">
-      </ToolNumber>
-      <ToolName xmlns="">Custom Programming Tool</ToolName>
-    </custom>
-    <CustomProgrammingToolCommand>avrdude -c usbasp-clone -p 328p</CustomProgrammingToolCommand>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <ToolchainSettings>
