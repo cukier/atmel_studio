@@ -7,7 +7,7 @@
 
 #include "sys.h"
 #include "i2c.h"
-#include "eeprom.h"
+#include "mem.h"
 #include "uart.h"
 #include "modbus.h"
 #include <avr/io.h>
@@ -18,8 +18,10 @@
 int main(void)
 {	
 	uart_init(UART_BAUD_SELECT(UART_BAUD_RATE, F_CPU));
+	#ifdef USE_EXTERNAL_EEPROM
 	TWIInit();
 	eeprom_init();
+	#endif
 	sei();
 	_delay_ms(300);
 	

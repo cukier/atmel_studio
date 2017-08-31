@@ -118,48 +118,51 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="ds1307.c">
+    <Compile Include="..\src\ds1307.c">
       <SubType>compile</SubType>
       <Link>ds1307.c</Link>
     </Compile>
-    <Compile Include="ds1307.h">
+    <Compile Include="..\src\ds1307.h">
       <SubType>compile</SubType>
       <Link>ds1307.h</Link>
     </Compile>
-    <Compile Include="eeprom.c">
+    <Compile Include="..\src\eeprom.c">
       <SubType>compile</SubType>
       <Link>eeprom.c</Link>
     </Compile>
-    <Compile Include="eeprom.h">
+    <Compile Include="..\src\eeprom.h">
       <SubType>compile</SubType>
       <Link>eeprom.h</Link>
     </Compile>
-    <Compile Include="i2c.c">
+    <Compile Include="..\src\i2c.c">
       <SubType>compile</SubType>
       <Link>i2c.c</Link>
     </Compile>
-    <Compile Include="i2c.h">
+    <Compile Include="..\src\i2c.h">
       <SubType>compile</SubType>
       <Link>i2c.h</Link>
     </Compile>
-    <Compile Include="main.c">
+    <Compile Include="..\src\main.c">
       <SubType>compile</SubType>
+      <Link>main.c</Link>
     </Compile>
-    <Compile Include="modbus.c">
+    <Compile Include="..\src\modbus.c">
       <SubType>compile</SubType>
+      <Link>modbus.c</Link>
     </Compile>
-    <Compile Include="modbus.h">
+    <Compile Include="..\src\modbus.h">
       <SubType>compile</SubType>
+      <Link>modbus.h</Link>
     </Compile>
-    <Compile Include="sys.h">
+    <Compile Include="..\src\sys.h">
       <SubType>compile</SubType>
       <Link>sys.h</Link>
     </Compile>
-    <Compile Include="uart.c">
+    <Compile Include="..\src\uart.c">
       <SubType>compile</SubType>
       <Link>uart.c</Link>
     </Compile>
-    <Compile Include="uart.h">
+    <Compile Include="..\src\uart.h">
       <SubType>compile</SubType>
       <Link>uart.h</Link>
     </Compile>
