@@ -261,7 +261,7 @@ bool modbus_slave(void) {
 					ret = return_error(READ_HOLDING_REGISTERS_COMMAND,
 					EXCEPTION_CODE_2);
 				}
-				else if (!eeprom_ready())
+				else if (!mem_ready())
 				{
 					ret = return_error(READ_HOLDING_REGISTERS_COMMAND,
 					EXCEPTION_CODE_0);
@@ -272,7 +272,7 @@ bool modbus_slave(void) {
 					response[0] = m_address;
 					response[1] = READ_HOLDING_REGISTERS_COMMAND;
 					response[2] = (uint8_t) b_count;
-					eeprom_read_data(aux_addr, &response[3], b_count);
+					mem_read_data(aux_addr, &response[3], b_count);
 					request_crc = CRC16(response, b_count + 3);
 					response[b_count + 3] = (uint8_t) (request_crc & 0xFF);
 					response[b_count + 4] = (uint8_t) ((request_crc & 0xFF00) >> 8);
@@ -287,7 +287,7 @@ bool modbus_slave(void) {
 					ret = return_error(WRITE_SINGLE_REGISTER_COMMAND,
 					EXCEPTION_CODE_2);
 				}
-				else if (!eeprom_ready())
+				else if (!mem_ready())
 				{
 					ret = return_error(READ_HOLDING_REGISTERS_COMMAND,
 					EXCEPTION_CODE_0);
@@ -296,7 +296,7 @@ bool modbus_slave(void) {
 				{
 					tmp_var[0] = (uint8_t) ((register_value & 0xFF00) >> 8);
 					tmp_var[1] = (uint8_t) (register_value & 0xFF);
-					eeprom_write_data(aux_addr, tmp_var, 2);
+					mem_write_data(aux_addr, tmp_var, 2);
 
 					for (cont = 0; cont < index_rda; ++cont)
 					{
@@ -314,14 +314,14 @@ bool modbus_slave(void) {
 					ret = return_error(WRITE_SINGLE_REGISTER_COMMAND,
 					EXCEPTION_CODE_2);
 				}
-				else if (!eeprom_ready())
+				else if (!mem_ready())
 				{
 					ret = return_error(READ_HOLDING_REGISTERS_COMMAND,
 					EXCEPTION_CODE_0);
 				}
 				else
 				{
-					eeprom_write_data(aux_addr, &request[7], b_count);
+					mem_write_data(aux_addr, &request[7], b_count);
 					response[0] = m_address;
 					response[1] = WRITE_MULTIPLE_REGISTERS_COMMAND;
 					response[2] = (uint8_t) ((register_address & 0xFF00) >> 8);
