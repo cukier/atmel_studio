@@ -1,4 +1,5 @@
 #include "mem.h"
+#include "i2c.h"
 
 bool mem_init()
 {
