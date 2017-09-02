@@ -16,6 +16,7 @@
 #include <stdbool.h>
 #include "sys.h"
 
-bool slave_response(void);
+bool slave_init(uint16_t address);
+bool modbus_slave(void);
 
 #endif /* MODBUS_H_ */

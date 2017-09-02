@@ -9,6 +9,7 @@
 #include "uart.h"
 #include "i2c.h"
 #include "eeprom.h"
+#include "mem.h"
 #include <stdlib.h>
 
 #define MB_MAX_SIZE eeprom_get_size()
@@ -110,6 +111,17 @@ static const uint16_t wCRCTable[] = { 0X0000, 0XC0C1, 0XC181, 0X0140, 0XC301,
 	0X8C41, 0X4400, 0X84C1, 0X8581, 0X4540, 0X8701, 0X47C0, 0X4680, 0X8641,
 0X8201, 0X42C0, 0X4380, 0X8341, 0X4100, 0X81C1, 0X8081, 0X4040 };
 
+static volatile uint16_t m_address;
+
+bool slave_init(uint16_t address)
+{
+	uart_init(UART_BAUD_SELECT(UART_BAUD_RATE, F_CPU));
+	m_address = address;
+	mem_init();
+	
+	return true;
+}
+
 uint16_t make16(uint8_t varhigh, uint8_t varlow) {
 	return (uint16_t) (varhigh & 0xff) * 0x100 + (varlow & 0xff);
 }
@@ -131,7 +143,7 @@ uint16_t CRC16(uint8_t *nData, uint16_t wLength) {
 	return wCRCWord;
 }
 
-bool send_modbus(uint8_t *data, uint16_t i_size) {
+bool modbus_send(uint8_t *data, uint16_t i_size) {
 	uart_send(data, i_size);
 	return true;
 }
@@ -179,7 +191,7 @@ uint8_t check_CRC(uint8_t *resp, modbus_command_t command) {
 	return (uint8_t) (crc_check == crc_in);
 }
 
-bool return_error(uint8_t address, modbus_command_t command,
+bool return_error(modbus_command_t command,
 modbus_command_exception_code_t error) {
 	uint8_t resp[5], ex_code;
 	uint16_t crc;
@@ -201,29 +213,19 @@ modbus_command_exception_code_t error) {
 		break;
 	}
 
-	#ifdef ADDR_MY
-	{
-		eeprom_read_word(ADDR_MY, &aux);
-		resp[0] = (uint8_t) aux;
-	}
-	#else
-	{
-		resp[0] = address;
-	}
-	#endif
-	
+	resp[0] = m_address;
 	resp[1] = ex_code;
 	resp[2] = error;
 	crc = CRC16(resp, 3);
 	resp[3] = (uint8_t) ((crc & 0xFF00) >> 8);
 	resp[4] = (uint8_t) (crc & 0xFF);
 
-	send_modbus(resp, 5);
+	modbus_send(resp, 5);
 
 	return true;
 }
 
-bool slave_response(void) {
+bool modbus_slave(void) {
 	uint8_t my_address, response[UINT8_MAX], request[UINT8_MAX], tmp_var[2];
 	uint16_t register_value, register_address, b_count, cont,
 	request_crc, aux_addr, index_rda, n, my_crc;
@@ -266,18 +268,18 @@ bool slave_response(void) {
 				case READ_HOLDING_REGISTERS_COMMAND:
 				if (register_value == 0 || register_value > 0x7D)
 				{
-					ret = return_error(my_address, READ_HOLDING_REGISTERS_COMMAND,
+					ret = return_error(READ_HOLDING_REGISTERS_COMMAND,
 					EXCEPTION_CODE_3);
 				}
 				else if (((register_value + register_address) * 2)
 				> (uint32_t) MB_MAX_SIZE)
 				{
-					ret = return_error(my_address, READ_HOLDING_REGISTERS_COMMAND,
+					ret = return_error(READ_HOLDING_REGISTERS_COMMAND,
 					EXCEPTION_CODE_2);
 				}
 				else if (!eeprom_ready())
 				{
-					ret = return_error(my_address, READ_HOLDING_REGISTERS_COMMAND,
+					ret = return_error(READ_HOLDING_REGISTERS_COMMAND,
 					EXCEPTION_CODE_0);
 				}
 				else
@@ -290,7 +292,7 @@ bool slave_response(void) {
 					request_crc = CRC16(response, b_count + 3);
 					response[b_count + 3] = (uint8_t) (request_crc & 0xFF);
 					response[b_count + 4] = (uint8_t) ((request_crc & 0xFF00) >> 8);
-					ret = send_modbus(response, b_count + 5);
+					ret = modbus_send(response, b_count + 5);
 				}
 				
 				break;
@@ -298,12 +300,12 @@ bool slave_response(void) {
 				case WRITE_SINGLE_REGISTER_COMMAND:
 				if (((register_address + 1) * 2) > (uint32_t) MB_MAX_SIZE)
 				{
-					ret = return_error(my_address, WRITE_SINGLE_REGISTER_COMMAND,
+					ret = return_error(WRITE_SINGLE_REGISTER_COMMAND,
 					EXCEPTION_CODE_2);
 				}
 				else if (!eeprom_ready())
 				{
-					ret = return_error(my_address, READ_HOLDING_REGISTERS_COMMAND,
+					ret = return_error(READ_HOLDING_REGISTERS_COMMAND,
 					EXCEPTION_CODE_0);
 				}
 				else
@@ -317,7 +319,7 @@ bool slave_response(void) {
 						response[cont] = request[cont];
 					}
 
-					ret = send_modbus(response, index_rda);
+					ret = modbus_send(response, index_rda);
 				}
 				
 				break;
@@ -325,12 +327,12 @@ bool slave_response(void) {
 				case WRITE_MULTIPLE_REGISTERS_COMMAND:
 				if (((register_address * 2) + b_count) > (uint32_t) MB_MAX_SIZE)
 				{
-					ret = return_error(my_address, WRITE_SINGLE_REGISTER_COMMAND,
+					ret = return_error(WRITE_SINGLE_REGISTER_COMMAND,
 					EXCEPTION_CODE_2);
 				}
 				else if (!eeprom_ready())
 				{
-					ret = return_error(my_address, READ_HOLDING_REGISTERS_COMMAND,
+					ret = return_error(READ_HOLDING_REGISTERS_COMMAND,
 					EXCEPTION_CODE_0);
 				}
 				else
@@ -345,7 +347,7 @@ bool slave_response(void) {
 					request_crc = CRC16(response, 6);
 					response[6] = (uint8_t) ((request_crc & 0xFF00) >> 8);
 					response[7] = (uint8_t) (request_crc & 0xFF);
-					ret = send_modbus(response, 8);
+					ret = modbus_send(response, 8);
 				}
 				
 				break;

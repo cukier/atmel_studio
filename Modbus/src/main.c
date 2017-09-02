@@ -16,18 +16,14 @@
 #include <stdlib.h>
 
 int main(void)
-{	
-	uart_init(UART_BAUD_SELECT(UART_BAUD_RATE, F_CPU));
-	#ifdef USE_EXTERNAL_EEPROM
-	TWIInit();
-	eeprom_init();
-	#endif
+{
+	slave_init(1);
 	sei();
 	_delay_ms(300);
 	
 	while (1)
 	{
-		slave_response();
+		modbus_slave();
 		_delay_ms(100);
 	}
 	
