@@ -228,21 +228,14 @@ modbus_command_exception_code_t error) {
 bool modbus_slave(void) {
 	uint8_t response[MODBUS_SLV_BUFFER], request[MODBUS_SLV_BUFFER], tmp_var[2];
 	uint16_t register_value, register_address, b_count, cont,
-	request_crc, aux_addr, index_rda, n, my_crc;
-	bool ret, respond_now;
+	request_crc, aux_addr, index_rda, my_crc;
+	bool ret;
 
 	ret = false;
-	respond_now = false;
-	n = 0;
-	n = uart_get(request, MODBUS_SLV_BUFFER);
+	index_rda = 0;
+	index_rda = uart_get(request, MODBUS_SLV_BUFFER);
 
-	if (n != 0) {
-		index_rda = n;
-		respond_now = true;
-	}
-
-	if (respond_now) {
-		respond_now = false;
+	if (index_rda != 0) {
 		register_value = (request[MODBUS_FIELDS_REGISTER_VALUE_H] << 8) |
 		request[MODBUS_FIELDS_REGISTER_VALUE_L];
 		register_address = (request[MODBUS_FIELDS_REGISTER_ADDRESS_H] << 8) |
