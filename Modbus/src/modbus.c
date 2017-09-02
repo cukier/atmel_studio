@@ -226,7 +226,7 @@ modbus_command_exception_code_t error) {
 }
 
 bool modbus_slave(void) {
-	uint8_t my_address, response[UINT8_MAX], request[UINT8_MAX], tmp_var[2];
+	uint8_t response[MODBUS_SLV_BUFFER], request[MODBUS_SLV_BUFFER], tmp_var[2];
 	uint16_t register_value, register_address, b_count, cont,
 	request_crc, aux_addr, index_rda, n, my_crc;
 	bool ret, respond_now;
@@ -234,20 +234,11 @@ bool modbus_slave(void) {
 	ret = false;
 	respond_now = false;
 	n = 0;
-	n = uart_get(request, UINT8_MAX);
+	n = uart_get(request, MODBUS_SLV_BUFFER);
 
 	if (n != 0) {
 		index_rda = n;
 		respond_now = true;
-		#ifdef MODBUS_SLV_ADDR
-		{
-			my_address = MODBUS_SLV_ADDR;
-		}
-		#else
-		{
-			my_address = 1;
-		}
-		#endif
 	}
 
 	if (respond_now) {
@@ -261,7 +252,7 @@ bool modbus_slave(void) {
 		request_crc = ((request[index_rda - 1] << 8) | (request[index_rda - 2]));
 		my_crc = CRC16(request, index_rda - 2);
 
-		if ((my_address == request[MODBUS_FIELDS_ADDRESS]) && my_crc == request_crc)
+		if ((m_address == request[MODBUS_FIELDS_ADDRESS]) && my_crc == request_crc)
 		{
 			switch (request[MODBUS_FIELDS_FUNCTION])
 			{
@@ -285,7 +276,7 @@ bool modbus_slave(void) {
 				else
 				{
 					b_count = 2 * register_value;
-					response[0] = my_address;
+					response[0] = m_address;
 					response[1] = READ_HOLDING_REGISTERS_COMMAND;
 					response[2] = (uint8_t) b_count;
 					eeprom_read_data(aux_addr, &response[3], b_count);
@@ -338,7 +329,7 @@ bool modbus_slave(void) {
 				else
 				{
 					eeprom_write_data(aux_addr, &request[7], b_count);
-					response[0] = my_address;
+					response[0] = m_address;
 					response[1] = WRITE_MULTIPLE_REGISTERS_COMMAND;
 					response[2] = (uint8_t) ((register_address & 0xFF00) >> 8);
 					response[3] = (uint8_t) (register_address & 0xFF);
