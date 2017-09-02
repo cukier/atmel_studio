@@ -2,9 +2,7 @@
 #define SRC_MEM_H
 
 #include "sys.h"
-#ifdef USE_EXTERNAL_EEPROM
-#include "eeprom.h"
-#endif
+
 #include <stdint.h>
 #include <stdbool.h>
 
