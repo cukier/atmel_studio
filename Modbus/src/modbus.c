@@ -122,19 +122,23 @@ bool slave_init(uint16_t address)
 	return true;
 }
 
-uint16_t make16(uint8_t varhigh, uint8_t varlow) {
+uint16_t make16(uint8_t varhigh, uint8_t varlow)
+{
 	return (uint16_t) (varhigh & 0xff) * 0x100 + (varlow & 0xff);
 }
 
-uint8_t make8(uint32_t var, uint8_t offset) {
+uint8_t make8(uint32_t var, uint8_t offset)
+{
 	return (uint8_t) (((var >> (offset * 8)) & 0xff));
 }
 
-uint16_t CRC16(uint8_t *nData, uint16_t wLength) {
+uint16_t CRC16(uint8_t *nData, uint16_t wLength)
+{
 	uint8_t nTemp;
 	uint16_t wCRCWord = 0xFFFF;
 
-	while (wLength--) {
+	while (wLength--)
+	{
 		nTemp = *nData++ ^ wCRCWord;
 		wCRCWord >>= 8;
 		wCRCWord ^= wCRCTable[nTemp];
@@ -143,12 +147,14 @@ uint16_t CRC16(uint8_t *nData, uint16_t wLength) {
 	return wCRCWord;
 }
 
-bool modbus_send(uint8_t *data, uint16_t i_size) {
+bool modbus_send(uint8_t *data, uint16_t i_size)
+{
 	uart_send(data, i_size);
 	return true;
 }
 
-uint8_t check_CRC(uint8_t *resp, modbus_command_t command) {
+uint8_t check_CRC(uint8_t *resp, modbus_command_t command)
+{
 	uint16_t ar_size, crc_check, crc_in, cont;
 	uint8_t *arr;
 	
@@ -158,7 +164,8 @@ uint8_t check_CRC(uint8_t *resp, modbus_command_t command) {
 	cont = 0;
 	arr = NULL;
 
-	switch (command) {
+	switch (command)
+	{
 		case READ_HOLDING_REGISTERS_COMMAND:
 		case READ_COILS_COMMAND:
 		case READ_DISCRETE_INPUT_COMMAND:
