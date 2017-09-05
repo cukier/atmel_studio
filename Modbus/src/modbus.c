@@ -233,9 +233,18 @@ bool modbus_slave(void) {
 
 	ret = false;
 	index_rda = 0;
+	uart_flush();
 	index_rda = uart_get(request, MODBUS_SLV_BUFFER);
 
 	if (index_rda != 0) {
+		#ifdef DBG
+		uart_printf("\n\nIndex RDA %lu\n", index_rda);
+		for (cont = 0; cont < index_rda; ++cont)
+		{
+			uart_printf("%lu %lu ", cont, request[cont]);
+		}
+		uart_printf("\n");
+		#endif
 		register_value = (request[MODBUS_FIELDS_REGISTER_VALUE_H] << 8) |
 		request[MODBUS_FIELDS_REGISTER_VALUE_L];
 		register_address = (request[MODBUS_FIELDS_REGISTER_ADDRESS_H] << 8) |
@@ -244,6 +253,14 @@ bool modbus_slave(void) {
 		aux_addr = 2 * register_address;
 		request_crc = ((request[index_rda - 1] << 8) | (request[index_rda - 2]));
 		my_crc = CRC16(request, index_rda - 2);
+		
+		#ifdef DBG
+		uart_printf("register_value %lu\n", register_value);
+		uart_printf("register_address %lu\n", register_address);
+		uart_printf("b_count %lu\n", b_count);
+		uart_printf("request_crc %lu\n", request_crc);
+		uart_printf("my_crc %lu\n", my_crc);
+		#endif
 
 		if ((m_address == request[MODBUS_FIELDS_ADDRESS]) && my_crc == request_crc)
 		{

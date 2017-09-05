@@ -18,8 +18,10 @@
 int main(void)
 {
 	slave_init(1);
+	//uart_init(UART_BAUD_SELECT(UART_BAUD_RATE, F_CPU));
 	sei();
 	_delay_ms(300);
+	uart_puts("Hello\n");
 	
 	while (1)
 	{

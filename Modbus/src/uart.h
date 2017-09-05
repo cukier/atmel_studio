@@ -47,6 +47,7 @@ LICENSE:
  */
  
 
+#include <stdarg.h>
 #include <avr/pgmspace.h>
 
 #if (__GNUC__ * 100 + __GNUC_MINOR__) < 405
@@ -117,7 +118,7 @@ LICENSE:
    @return  none
 */
 extern void uart_init(unsigned int baudrate);
-
+extern void uart_flush(void);
 
 /**
  *  @brief   Get received byte from ringbuffer
@@ -165,6 +166,7 @@ extern void uart_putc(unsigned char data);
  *  @return  none
  */
 extern void uart_puts(const char *s );
+void uart_printf(char *format, ...);
 void uart_send(uint8_t *data, uint16_t size);
 
 
