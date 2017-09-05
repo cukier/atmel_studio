@@ -7,7 +7,7 @@
 
 #include "sys.h"
 #include "i2c.h"
-#include "eeprom.h"
+#include "mem.h"
 #include "uart.h"
 #include "modbus.h"
 #include <avr/io.h>
@@ -16,16 +16,16 @@
 #include <stdlib.h>
 
 int main(void)
-{	
-	uart_init(UART_BAUD_SELECT(UART_BAUD_RATE, F_CPU));
-	TWIInit();
-	eeprom_init();
+{
+	slave_init(1);
+	//uart_init(UART_BAUD_SELECT(UART_BAUD_RATE, F_CPU));
 	sei();
 	_delay_ms(300);
+	uart_puts("Hello\n");
 	
 	while (1)
 	{
-		slave_response();
+		modbus_slave();
 		_delay_ms(100);
 	}
 	

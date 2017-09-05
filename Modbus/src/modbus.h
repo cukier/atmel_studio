@@ -16,6 +16,11 @@
 #include <stdbool.h>
 #include "sys.h"
 
-bool slave_response(void);
+#ifndef MODBUS_SLV_BUFFER
+#define MODBUS_SLV_BUFFER	0x7F
+#endif
+
+bool slave_init(uint16_t address);
+bool modbus_slave(void);
 
 #endif /* MODBUS_H_ */
