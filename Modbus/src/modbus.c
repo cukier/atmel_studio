@@ -10,7 +10,9 @@
 #include "i2c.h"
 #include "eeprom.h"
 #include "mem.h"
+
 #include <stdlib.h>
+#include <util/delay.h>
 
 #define MB_MAX_SIZE mem_get_size()
 
@@ -347,4 +349,116 @@ bool modbus_slave(void) {
 	}
 
 	return ret;
+}
+
+uint8_t l_byte(uint16_t m_word)
+{
+	uint8_t ret;
+	
+	ret = 0;
+	ret = m_word & 0xFF;
+	
+	return ret;
+}
+
+uint8_t h_byte(uint16_t m_word)
+{
+	uint8_t ret;
+	
+	ret = 0;
+	ret = ((m_word & 0xFF00) >> 8) & 0xFF;
+	
+	return ret;
+}
+
+void make_read_request(uint8_t addr, uint16_t s_addr, uint16_t nb, uint8_t *request)
+{
+	uint16_t crc;
+	
+	crc = 0;
+	
+	request[0] = addr;
+	request[1] = 0x03;
+	request[2] = h_byte(s_addr);
+	request[3] = l_byte(s_addr);
+	request[4] = h_byte(nb);
+	request[5] = l_byte(nb);
+	
+	crc = CRC16(request, 6);
+	
+	request[6] = l_byte(crc);
+	request[7] = h_byte(crc);
+	
+	return;
+}
+
+void make_write_request(uint8_t addr, uint16_t s_addr, uint16_t value, uint8_t *request)
+{
+	uint16_t crc;
+	
+	crc = 0;
+	
+	request[0] = addr;
+	request[1] = 0x06;
+	request[2] = h_byte(s_addr);
+	request[3] = l_byte(s_addr);
+	request[4] = h_byte(value);
+	request[5] = l_byte(value);
+	
+	crc = CRC16(request, 6);
+	
+	request[6] = l_byte(crc);
+	request[7] = h_byte(crc);
+	
+	return;
+}
+
+uint16_t modbus_get_register(uint8_t slv_addr, uint16_t register_address)
+{
+	uint16_t ret = 0, n = 0;
+	uint8_t request[8];
+	uint8_t response[7];
+	uint8_t tries;
+	
+	tries = TENTATIVAS - 1;
+	
+	do
+	{
+		uart_flush();
+		make_read_request(slv_addr, register_address, 1, request);
+		uart_send(request, 8);
+		_delay_ms(DELAY_REQUEST);
+		n = 0;
+		//n = uart_get_rx_size();
+		
+		if (n == 7)
+		{
+			break;
+		}
+		else
+		{
+			_delay_ms(1000);
+			
+			if (!tries)
+			{
+				return 0xFFFF;
+			}
+		}
+	} while (tries--);
+	
+	//uart_get(response, 7);
+	ret = make16(response[3], response[4]);
+	
+	return ret;
+}
+
+void modbus_set_register(uint8_t slv_addr, uint16_t register_address, uint16_t value)
+{
+	uint8_t request[8];
+	
+	make_write_request(slv_addr, register_address, value, request);
+	uart_send(request, 8);
+	_delay_ms(DELAY_REQUEST);
+	
+	return;
 }

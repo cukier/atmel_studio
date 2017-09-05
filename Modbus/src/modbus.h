@@ -9,8 +9,6 @@
 #ifndef MODBUS_H_
 #define MODBUS_H_
 
-#define MODBUS_SLV_ADDR	1
-
 #include <avr/io.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -20,7 +18,17 @@
 #define MODBUS_SLV_BUFFER	0x7F
 #endif
 
+#ifndef DELAY_REQUEST
+#define DELAY_REQUEST		100
+#endif
+
+#ifndef TENTATIVAS
+#define TENTATIVAS			4
+#endif
+
 bool slave_init(uint16_t address);
 bool modbus_slave(void);
+uint16_t modbus_get_register(uint8_t slv_addr, uint16_t register_address);
+void modbus_set_register(uint8_t slv_addr, uint16_t register_address, uint16_t value);
 
 #endif /* MODBUS_H_ */
