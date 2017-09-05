@@ -233,20 +233,10 @@ bool modbus_slave(void) {
 
 	ret = false;
 	index_rda = 0;
-	//uart_flush();
-	//index_rda = uart_get(request, MODBUS_SLV_BUFFER);
 	index_rda = uart_available();
 
 	if (index_rda != 0) {
 		uart_get(request, index_rda);
-		#ifdef DBG
-		uart_printf("\n\nIndex RDA %lu\n", index_rda);
-		for (cont = 0; cont < index_rda; ++cont)
-		{
-			uart_printf("%u %u ", cont, request[cont]);
-		}
-		uart_printf("\n");
-		#endif
 		register_value = (request[MODBUS_FIELDS_REGISTER_VALUE_H] << 8) |
 		request[MODBUS_FIELDS_REGISTER_VALUE_L];
 		register_address = (request[MODBUS_FIELDS_REGISTER_ADDRESS_H] << 8) |
@@ -255,53 +245,29 @@ bool modbus_slave(void) {
 		aux_addr = 2 * register_address;
 		request_crc = ((request[index_rda - 1] << 8) | (request[index_rda - 2]));
 		my_crc = CRC16(request, index_rda - 2);
-		
-		#ifdef DBG
-		uart_printf("register_value %u\n", register_value);
-		uart_printf("register_address %u\n", register_address);
-		uart_printf("b_count %u\n", b_count);
-		uart_printf("request_crc %u\n", request_crc);
-		uart_printf("my_crc %u\n", my_crc);
-		#endif
 
 		if ((m_address == request[MODBUS_FIELDS_ADDRESS]) && my_crc == request_crc)
 		{
-			#ifdef DBG
-			uart_printf("if ((m_address == request[MODBUS_FIELDS_ADDRESS]) && my_crc == request_crc)\n");
-			uart_printf("switch (request[MODBUS_FIELDS_FUNCTION]) %u\n", request[MODBUS_FIELDS_FUNCTION]);
-			#endif
 			switch (request[MODBUS_FIELDS_FUNCTION])
 			{
 				case READ_HOLDING_REGISTERS_COMMAND:
 				if (register_value == 0 || register_value > 0x7D)
 				{
-					#ifdef DBG
-					uart_printf("if (register_value == 0 || register_value > 0x7D)\n");
-					#endif
 					ret = return_error(READ_HOLDING_REGISTERS_COMMAND,
 					EXCEPTION_CODE_3);
 				}
 				else if (((register_value + register_address) * 2) > (uint32_t) MB_MAX_SIZE)
 				{
-					#ifdef DBG
-					uart_printf("else if (((register_value + register_address) * 2) > (uint32_t) MB_MAX_SIZE)\n");
-					#endif
 					ret = return_error(READ_HOLDING_REGISTERS_COMMAND,
 					EXCEPTION_CODE_2);
 				}
 				else if (!mem_ready())
 				{
-					#ifdef DBG
-					uart_printf("!mem_ready()\n");
-					#endif
 					ret = return_error(READ_HOLDING_REGISTERS_COMMAND,
 					EXCEPTION_CODE_0);
 				}
 				else
 				{
-					#ifdef DBG
-					uart_printf("else (if (register_value == 0 || register_value > 0x7D))\n");
-					#endif
 					b_count = 2 * register_value;
 					response[0] = m_address;
 					response[1] = READ_HOLDING_REGISTERS_COMMAND;
@@ -316,9 +282,6 @@ bool modbus_slave(void) {
 				break;
 
 				case WRITE_SINGLE_REGISTER_COMMAND:
-				#ifdef DBG
-				uart_printf("case WRITE_SINGLE_REGISTER_COMMAND:\n");
-				#endif
 				if (((register_address + 1) * 2) > (uint32_t) MB_MAX_SIZE)
 				{
 					ret = return_error(WRITE_SINGLE_REGISTER_COMMAND,
