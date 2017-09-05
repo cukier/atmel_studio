@@ -12,7 +12,7 @@
 #include "mem.h"
 #include <stdlib.h>
 
-#define MB_MAX_SIZE eeprom_get_size()
+#define MB_MAX_SIZE mem_get_size()
 
 typedef enum modbus_command_exception_code {
 	EXCEPTION_CODE_0,
@@ -266,27 +266,42 @@ bool modbus_slave(void) {
 
 		if ((m_address == request[MODBUS_FIELDS_ADDRESS]) && my_crc == request_crc)
 		{
+			#ifdef DBG
+			uart_printf("if ((m_address == request[MODBUS_FIELDS_ADDRESS]) && my_crc == request_crc)\n");
+			uart_printf("switch (request[MODBUS_FIELDS_FUNCTION]) %u\n", request[MODBUS_FIELDS_FUNCTION]);
+			#endif
 			switch (request[MODBUS_FIELDS_FUNCTION])
 			{
 				case READ_HOLDING_REGISTERS_COMMAND:
 				if (register_value == 0 || register_value > 0x7D)
 				{
+					#ifdef DBG
+					uart_printf("if (register_value == 0 || register_value > 0x7D)\n");
+					#endif
 					ret = return_error(READ_HOLDING_REGISTERS_COMMAND,
 					EXCEPTION_CODE_3);
 				}
-				else if (((register_value + register_address) * 2)
-				> (uint32_t) MB_MAX_SIZE)
+				else if (((register_value + register_address) * 2) > (uint32_t) MB_MAX_SIZE)
 				{
+					#ifdef DBG
+					uart_printf("else if (((register_value + register_address) * 2) > (uint32_t) MB_MAX_SIZE)\n");
+					#endif
 					ret = return_error(READ_HOLDING_REGISTERS_COMMAND,
 					EXCEPTION_CODE_2);
 				}
 				else if (!mem_ready())
 				{
+					#ifdef DBG
+					uart_printf("!mem_ready()\n");
+					#endif
 					ret = return_error(READ_HOLDING_REGISTERS_COMMAND,
 					EXCEPTION_CODE_0);
 				}
 				else
 				{
+					#ifdef DBG
+					uart_printf("else (if (register_value == 0 || register_value > 0x7D))\n");
+					#endif
 					b_count = 2 * register_value;
 					response[0] = m_address;
 					response[1] = READ_HOLDING_REGISTERS_COMMAND;
@@ -301,6 +316,9 @@ bool modbus_slave(void) {
 				break;
 
 				case WRITE_SINGLE_REGISTER_COMMAND:
+				#ifdef DBG
+				uart_printf("case WRITE_SINGLE_REGISTER_COMMAND:\n");
+				#endif
 				if (((register_address + 1) * 2) > (uint32_t) MB_MAX_SIZE)
 				{
 					ret = return_error(WRITE_SINGLE_REGISTER_COMMAND,

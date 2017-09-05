@@ -104,7 +104,7 @@
  *  constants and macros
  */
 
-#define UART_TX_BUFFER_SIZE 30
+#define UART_TX_BUFFER_SIZE UART_RX0_BUFFER_SIZE
 
 /* size of RX/TX buffers */
 #define UART_RX0_BUFFER_MASK (UART_RX0_BUFFER_SIZE - 1)

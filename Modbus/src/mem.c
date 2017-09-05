@@ -53,3 +53,12 @@ bool mem_write_data(uint16_t address, uint8_t *data, uint16_t size)
 	return true;
 	#endif
 }
+
+uint32_t mem_get_size(void)
+{
+	#ifdef USE_EXTERNAL_EEPROM
+	return eeprom_get_size();
+	#endif
+	
+	return 1024;
+}
