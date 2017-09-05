@@ -26,7 +26,7 @@
 #define TENTATIVAS			4
 #endif
 
-bool slave_init(uint16_t address);
+bool modbus_init(uint16_t address);
 bool modbus_slave(void);
 uint16_t modbus_get_register(uint8_t slv_addr, uint16_t register_address);
 void modbus_set_register(uint8_t slv_addr, uint16_t register_address, uint16_t value);

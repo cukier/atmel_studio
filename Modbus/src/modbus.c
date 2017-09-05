@@ -114,8 +114,14 @@ static const uint16_t wCRCTable[] = { 0X0000, 0XC0C1, 0XC181, 0X0140, 0XC301,
 0X8201, 0X42C0, 0X4380, 0X8341, 0X4100, 0X81C1, 0X8081, 0X4040 };
 
 static volatile uint16_t m_address;
+static volatile bool modbus_err;
 
-bool slave_init(uint16_t address)
+bool modbus_get_err(void)
+{
+	return modbus_err;
+}
+
+bool modbus_init(uint16_t address)
 {
 	uart_init(UART_BAUD_SELECT(UART_BAUD_RATE, F_CPU));
 	m_address = address;
@@ -421,15 +427,16 @@ uint16_t modbus_get_register(uint8_t slv_addr, uint16_t register_address)
 	uint8_t tries;
 	
 	tries = TENTATIVAS - 1;
+	modbus_err = false;
 	
 	do
 	{
-		uart_flush();
 		make_read_request(slv_addr, register_address, 1, request);
 		uart_send(request, 8);
+		uart_flush();
 		_delay_ms(DELAY_REQUEST);
 		n = 0;
-		//n = uart_get_rx_size();
+		n = uart_get_rx_size();
 		
 		if (n == 7)
 		{
@@ -441,12 +448,13 @@ uint16_t modbus_get_register(uint8_t slv_addr, uint16_t register_address)
 			
 			if (!tries)
 			{
+				modbus_err = true;
 				return 0xFFFF;
 			}
 		}
 	} while (tries--);
 	
-	//uart_get(response, 7);
+	uart_get(response, 7);
 	ret = make16(response[3], response[4]);
 	
 	return ret;
@@ -455,10 +463,17 @@ uint16_t modbus_get_register(uint8_t slv_addr, uint16_t register_address)
 void modbus_set_register(uint8_t slv_addr, uint16_t register_address, uint16_t value)
 {
 	uint8_t request[8];
+	uint16_t n;
 	
+	modbus_err = false;
+	uart_flush();
 	make_write_request(slv_addr, register_address, value, request);
 	uart_send(request, 8);
 	_delay_ms(DELAY_REQUEST);
+	n = 0;
+	n = uart_get_rx_size();	
+	modbus_err = (n != 0);
+	uart_flush();
 	
 	return;
 }
