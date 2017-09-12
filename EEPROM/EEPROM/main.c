@@ -1,95 +1,44 @@
-/*
-* EEPROM.c
-*
-* Created: 09/04/2017 20:49:16
-* Author : cuki
-*/
-
 #include "sys.h"
-#include "eeprom.h"
-#include "i2c.h"
 #include "uart.h"
-#include <avr/io.h>
-#include <util/delay.h>
-#include <avr/interrupt.h>
-#include <stdlib.h>
+#include "mem.h"
 
-#define TEST_SIZE	128
+#include <util/delay.h>
+#include <avr/io.h>
+#include <avr/interrupt.h>
+#include <stdio.h>
+#include <stdint.h>
+#include <stdbool.h>
 
 int main(void)
 {
-	uint16_t data[TEST_SIZE] = {0};
-	uint16_t dataW[TEST_SIZE] = {0};
-	uint16_t dataR[TEST_SIZE] = {0};
-	char aux[5];
-	uint16_t cont, val;
-	uint8_t r;
+	uint16_t val;
+	char str[50];
 	
-	r = ERROR;
-	val = 0;
-	
-	for (cont = 0; cont < TEST_SIZE; ++cont)
-	{
-		dataW[cont] = cont;
-	}
-	
-	eeprom_init();
-	TWIInit();
 	uart_init(UART_BAUD_SELECT(UART_BAUD_RATE, F_CPU));
+	mem_init();
 	sei();
 	_delay_ms(300);
 	
-	while (1)
+	uart_puts("Init\n\r");
+	
+	while(true)
 	{
-		r = ERROR;
-		eeprom_read_data(0, data, TEST_SIZE);
-		r = eeprom_write_data(0, dataW, TEST_SIZE);
-		
-		if (r == SUCCESS)
+		if (mem_ready())
 		{
-			uart_puts("Escrita ok\n\r");
-		}
-		else
-		{
-			uart_puts("Escrita no ok\n\r");
+			//val = eeprom_read_word((uint16_t *) 0x10);
+			val = mem_read_word(0x10);
+			sprintf(str, "Val %u\n\r", val);
+			uart_puts(str);
 		}
 		
-		r = ERROR;
-		r = eeprom_read_data(0, dataR, TEST_SIZE);
-		
-		if (r == SUCCESS)
+		if (mem_ready())
 		{
-			uart_puts("Leitura ok\n\r");
+			//eeprom_write_word((uint16_t *) 0x10, 0x30);
+			mem_write_word(0x10, 0x30);
 		}
-		else
-		{
-			uart_puts("Leitura no ok\n\r");
-		}
-		
-		for (cont = 0; cont < TEST_SIZE; ++cont)
-		{
-			itoa(cont, aux, 16);
-			uart_puts(aux);
-			uart_puts(":");
-			itoa(data[cont], aux, 16);
-			uart_puts(aux);
-			uart_puts(" ");
-			itoa(dataR[cont], aux, 16);
-			uart_puts(aux);
-			uart_puts(" ");
-			itoa(dataW[cont], aux, 16);
-			uart_puts(aux);
-			uart_puts("\n\r");
-		}
-		
-		eeprom_read_word(0x10, &val);
-		itoa(val, aux, 16);
-		uart_puts(aux);
-		uart_puts("\n\r");
 		
 		_delay_ms(1000);
 	}
 	
 	return 0;
 }
-
