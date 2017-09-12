@@ -6,9 +6,10 @@
 */
 
 #include "sys.h"
-#include "eeprom.h"
-#include "i2c.h"
 #include "uart.h"
+#include "mem.h"
+#include "i2c.h"
+
 #include <avr/io.h>
 #include <util/delay.h>
 #include <avr/interrupt.h>
@@ -33,8 +34,7 @@ int main(void)
 		dataW[cont] = cont;
 	}
 	
-	eeprom_init();
-	TWIInit();
+	mem_init();
 	uart_init(UART_BAUD_SELECT(UART_BAUD_RATE, F_CPU));
 	sei();
 	_delay_ms(300);
@@ -42,8 +42,8 @@ int main(void)
 	while (1)
 	{
 		r = ERROR;
-		eeprom_read_data(0, data, TEST_SIZE);
-		r = eeprom_write_data(0, dataW, TEST_SIZE);
+		mem_read_data(0, (uint8_t *) data, TEST_SIZE * 2);
+		r = mem_write_data(0, (uint8_t *) dataW, TEST_SIZE * 2);
 		
 		if (r == SUCCESS)
 		{
@@ -55,7 +55,7 @@ int main(void)
 		}
 		
 		r = ERROR;
-		r = eeprom_read_data(0, dataR, TEST_SIZE);
+		r = mem_read_data(0, (uint8_t *) dataR, TEST_SIZE * 2);
 		
 		if (r == SUCCESS)
 		{
@@ -82,7 +82,7 @@ int main(void)
 			uart_puts("\n\r");
 		}
 		
-		eeprom_read_word(0x10, &val);
+		val = mem_read_word(0x10);
 		itoa(val, aux, 16);
 		uart_puts(aux);
 		uart_puts("\n\r");
