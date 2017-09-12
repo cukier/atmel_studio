@@ -59,7 +59,7 @@ bool mem_write_word(uint16_t address, uint16_t value)
 	#ifdef USE_EXTERNAL_EEPROM
 	return mem_write_data(address, (uint8_t *) &value, 2);
 	#else
-	eeprom_write_word((uint16_t *) address, value);
+	eeprom_write_word((uint16_t *) &address, value);
 	#endif
 	
 	return true;
@@ -73,7 +73,7 @@ uint16_t mem_read_word(uint16_t address)
 	#ifdef USE_EXTERNAL_EEPROM
 	mem_read_data(address, (uint8_t *) &ret, 2);
 	#else
-	ret = eeprom_read_word((uint16_t *) address);
+	ret = eeprom_read_word((uint16_t *) &address);
 	#endif
 	
 	return ret;

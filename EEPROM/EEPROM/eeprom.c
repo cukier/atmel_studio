@@ -40,7 +40,7 @@ uint8_t eeprom_write_data(uint16_t address, uint8_t *data, uint16_t size)
 	
 	return TWIWriteData(address, data, size);
 }
-
+/*
 uint8_t eeprom_read_word(uint16_t address, uint16_t *data)
 {
 	uint16_t addr = address * 2;
@@ -90,7 +90,7 @@ uint8_t eeprom_write_word_data(uint16_t address, uint16_t *data, uint16_t size)
 	
 	return TWIWriteData(addr, (uint8_t *) data, n_size);
 }
-
+*/
 uint8_t eeprom_init(void)
 {
 	eeprom_address = 0xA0;

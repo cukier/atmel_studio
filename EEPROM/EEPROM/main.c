@@ -14,6 +14,7 @@
 #include <util/delay.h>
 #include <avr/interrupt.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #define TEST_SIZE	128
 
@@ -22,7 +23,7 @@ int main(void)
 	uint16_t data[TEST_SIZE] = {0};
 	uint16_t dataW[TEST_SIZE] = {0};
 	uint16_t dataR[TEST_SIZE] = {0};
-	char aux[5];
+	char aux[50];
 	uint16_t cont, val;
 	uint8_t r;
 	
@@ -41,7 +42,7 @@ int main(void)
 	
 	while (1)
 	{
-		r = ERROR;
+		/*r = ERROR;
 		mem_read_data(0, (uint8_t *) data, TEST_SIZE * 2);
 		r = mem_write_data(0, (uint8_t *) dataW, TEST_SIZE * 2);
 		
@@ -68,24 +69,18 @@ int main(void)
 		
 		for (cont = 0; cont < TEST_SIZE; ++cont)
 		{
-			itoa(cont, aux, 16);
+			sprintf(aux, "%05u %05u %05u %05u\n\r", cont, data[cont], dataW[cont], dataR[cont]);
 			uart_puts(aux);
-			uart_puts(":");
-			itoa(data[cont], aux, 16);
-			uart_puts(aux);
-			uart_puts(" ");
-			itoa(dataR[cont], aux, 16);
-			uart_puts(aux);
-			uart_puts(" ");
-			itoa(dataW[cont], aux, 16);
-			uart_puts(aux);
-			uart_puts("\n\r");
 		}
-		
+		*/
 		val = mem_read_word(0x10);
-		itoa(val, aux, 16);
+		sprintf(aux, "Val %u\n\r", val);
 		uart_puts(aux);
-		uart_puts("\n\r");
+		mem_write_word(0x10, 0x30);
+		val = 0;
+		val = mem_read_word(0x10);
+		sprintf(aux, "Val %u\n\r", val);
+		uart_puts(aux);
 		
 		_delay_ms(1000);
 	}
