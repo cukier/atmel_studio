@@ -15,8 +15,6 @@ uint16_t mem_read_word(uint16_t address);
 uint32_t mem_get_size(void);
 bool mem_get_bool(uint16_t address);
 void mem_set_bool(uint16_t address, bool value);
-//uint16_t mem_get_word(uint16_t address);
-//void mem_set_word(uint16_t address, uint16_t value);
 
 
 #endif

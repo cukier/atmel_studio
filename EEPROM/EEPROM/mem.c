@@ -19,9 +19,9 @@ bool mem_ready()
 {
 	#ifdef USE_EXTERNAL_EEPROM
 	return eeprom_ready();
+	#else
+	return eeprom_is_ready();
 	#endif
-	
-	return true;
 }
 
 bool mem_read_data(uint16_t address, uint8_t *data, uint16_t size)
@@ -59,7 +59,7 @@ bool mem_write_word(uint16_t address, uint16_t value)
 	#ifdef USE_EXTERNAL_EEPROM
 	return mem_write_data(address, (uint8_t *) &value, 2);
 	#else
-	eeprom_write_word((uint16_t *) &address, value);
+	eeprom_write_word((uint16_t *) address, value);
 	#endif
 	
 	return true;
@@ -72,8 +72,8 @@ uint16_t mem_read_word(uint16_t address)
 	ret = 0;
 	#ifdef USE_EXTERNAL_EEPROM
 	mem_read_data(address, (uint8_t *) &ret, 2);
-	#else
-	ret = eeprom_read_word((uint16_t *) &address);
+	#else	
+	ret = eeprom_read_word((uint16_t *) address);
 	#endif
 	
 	return ret;
@@ -119,23 +119,6 @@ void mem_set_bool(uint16_t address, bool value)
 	}
 	
 	mem_write_data(word, (uint8_t *) &val, 2);
-	
-	return;
-}
-
-uint16_t mem_get_word(uint16_t address)
-{
-	uint16_t val;
-	
-	val = 0;
-	//mem_read_data(address, (uint8_t *) &val, 2);
-	
-	return val;
-}
-
-void mem_set_word(uint16_t address, uint16_t value)
-{
-	mem_write_data(address, (uint8_t *) &value, 2);
 	
 	return;
 }
