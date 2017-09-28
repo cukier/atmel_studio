@@ -17,11 +17,11 @@
 
 int main(void)
 {
-	uint8_t cont;
-	uint16_t leit;
+	//uint8_t cont;
+	//uint16_t leit;
 	
-	leit = 0;
-	cont = 0;
+	//leit = 0;
+	//cont = 0;
 	modbus_init(1);
 	//uart_init(UART_BAUD_SELECT(UART_BAUD_RATE, F_CPU));
 	sei();
@@ -30,12 +30,12 @@ int main(void)
 	
 	while (1)
 	{
-		//modbus_slave();
-		leit = modbus_get_register(1, 0);
-		modbus_set_register(1, 1, cont++);
+		modbus_slave();
+		//leit = modbus_get_register(1, 0);
+		//modbus_set_register(1, 1, cont++);
 		//_delay_ms(10);
-		modbus_set_register(1, 2, leit);
-		_delay_ms(1000);
+		//modbus_set_register(1, 2, leit);
+		//_delay_ms(1000);
 	}
 	
 	return 0;

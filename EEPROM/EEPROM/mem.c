@@ -6,6 +6,22 @@
 #include <avr/eeprom.h>
 #endif
 
+uint16_t m_swap_word(uint16_t val)
+{
+	uint8_t h, l;
+	uint16_t ret;
+
+	h = 0;
+	h = (uint8_t) ((val & 0xFF00) >> 8);
+	l = 0;
+	l = (uint8_t) (val & 0xFF);
+	ret = 0;
+	ret = (l << 8) & 0xFF00;
+	ret |= h;
+	
+	return ret;
+}
+
 bool mem_init()
 {
 	#ifdef USE_EXTERNAL_EEPROM
@@ -56,10 +72,13 @@ bool mem_write_data(uint16_t address, uint8_t *data, uint16_t size)
 
 bool mem_write_word(uint16_t address, uint16_t value)
 {
+	
+	while (!mem_ready());
+	
 	#ifdef USE_EXTERNAL_EEPROM
 	return mem_write_data(address, (uint8_t *) &value, 2);
 	#else
-	eeprom_write_word((uint16_t *) address, value);
+	eeprom_write_word((uint16_t *) address, m_swap_word(value));
 	#endif
 	
 	return true;
@@ -69,11 +88,14 @@ uint16_t mem_read_word(uint16_t address)
 {
 	uint16_t ret;
 	
+	while (!mem_ready());
+	
 	ret = 0;
 	#ifdef USE_EXTERNAL_EEPROM
 	mem_read_data(address, (uint8_t *) &ret, 2);
-	#else	
+	#else
 	ret = eeprom_read_word((uint16_t *) address);
+	ret = m_swap_word(ret);
 	#endif
 	
 	return ret;

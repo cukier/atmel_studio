@@ -23,20 +23,11 @@ int main(void)
 	
 	while(true)
 	{
-		if (mem_ready())
-		{
-			//val = eeprom_read_word((uint16_t *) 0x10);
-			val = mem_read_word(0x10);
-			sprintf(str, "Val %u\n\r", val);
-			uart_puts(str);
-		}
-		
-		if (mem_ready())
-		{
-			//eeprom_write_word((uint16_t *) 0x10, 0x30);
-			mem_write_word(0x10, 0x30);
-		}
-		
+		val = mem_read_word(0x10);
+		sprintf(str, "Val %u\n\r", val);
+		uart_puts(str);
+		//eeprom_write_word((uint16_t *) 0x10, 0x30);
+		mem_write_word(0x10, 0x30);
 		_delay_ms(1000);
 	}
 	

@@ -13,13 +13,13 @@
 int main(void)
 {
 	DDRB |= _BV(DDB1);
-	DDRC |= _BV(DDC0);
+	//DDRC |= _BV(DDC0);
     
     while (1) 
     {
 		PORTB ^= _BV(PORTB1);
-		PORTC ^= _BV(PORTC0);
-		_delay_ms(100);
+		//PORTC ^= _BV(PORTC0);
+		_delay_ms(300);
     }
 	
 	return 0;
