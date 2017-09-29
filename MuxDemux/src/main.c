@@ -6,7 +6,7 @@
 */
 
 #include "sys.h"
-#include "uart.h"
+#include "modbus.h"
 
 #include <avr/io.h>
 #include <util/delay.h>
@@ -50,13 +50,10 @@ void set_addr(uint8_t out_addr)
 int main(void)
 {
 	uint8_t cont;
-	uint8_t n;
 	
 	cont = 0;
-	n = 0;
 	init_addrs();
-	uart_flush();
-	uart_init(UART_BAUD_SELECT(UART_BAUD_RATE, F_CPU));
+	modbus_init(1);
 	sei();
 	_delay_ms(300);
 
@@ -64,21 +61,7 @@ int main(void)
 	{
 		set_addr(cont);
 		//_delay_ms(300);
-		
-		do 
-		{
-			n = uart_available();
-			_delay_ms(100);
-		} while (n != uart_available());
-		
-		if (n != 0)
-		{
-			uart_printf("Recebido %u na porta %u\n\r", n, cont);			
-			n = 0;
-			uart_flush();
-			_delay_ms(1000);
-		}
-		
+		modbus_slave();		
 		cont++;
 		
 		if (cont == 3)
