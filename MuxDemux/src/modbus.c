@@ -124,6 +124,7 @@ bool modbus_get_err(void)
 bool modbus_init(uint16_t address)
 {
 	uart_init(UART_BAUD_SELECT(UART_BAUD_RATE, F_CPU));
+	uart1_init(UART_BAUD_SELECT(UART_BAUD_RATE, F_CPU));
 	m_address = address;
 	mem_init();
 	
@@ -435,7 +436,7 @@ uint16_t modbus_get_register(uint8_t slv_addr, uint16_t register_address)
 	uint8_t response[7];
 	uint8_t tries;
 	
-	tries = TENTATIVAS - 1;
+	tries = TENTATIVAS;
 	modbus_err = false;
 	
 	do
@@ -447,9 +448,11 @@ uint16_t modbus_get_register(uint8_t slv_addr, uint16_t register_address)
 		n = 0;
 		n = uart_get_rx_size();
 		
+		uart1_printf("Recebido %u\n\r", n);
+		
 		if (n == 7)
 		{
-			break;
+			tries = 1;
 		}
 		else
 		{
@@ -461,7 +464,7 @@ uint16_t modbus_get_register(uint8_t slv_addr, uint16_t register_address)
 				return 0xFFFF;
 			}
 		}
-	} while (tries--);
+	} while (--tries);
 	
 	uart_get(response, 7);
 	ret = make16(response[3], response[4]);

@@ -7,6 +7,7 @@
 
 #include "sys.h"
 #include "modbus.h"
+#include "uart.h"
 
 #include <avr/io.h>
 #include <util/delay.h>
@@ -60,8 +61,14 @@ int main(void)
 	while (1)
 	{
 		set_addr(cont);
-		modbus_slave();
-		_delay_ms(300);
+		//modbus_slave();
+		modbus_get_register(1, 0);
+		
+		while(uart_tx_available())
+		{
+			_delay_ms(10);
+		}
+		
 		cont++;
 		
 		if (cont == 2)

@@ -216,11 +216,15 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 /** @brief Macro to put string to ringbuffer for transmitting via USART0 (only available on selected ATmega) @see uart0_puts */
 #define uart_puts(s)      uart0_puts(s)
 
+#define uart_printf(s)	  uart0_printf(s)
+
 /** @brief Macro to put string from program memory to ringbuffer for transmitting via USART0 (only available on selected ATmega) @see uart0_puts_p */
 #define uart_puts_p(s)    uart0_puts_p(s)
 
 /** @brief Macro to return number of bytes waiting in the receive buffer of USART0 @see uart0_available */
 #define uart_available()  uart0_available()
+
+#define uart_tx_available()  uart0_tx_available()
 
 /** @brief Macro to flush bytes waiting in receive buffer of USART0 @see uart0_flush */
 #define uart_flush()      uart0_flush()
@@ -324,7 +328,7 @@ extern void uart0_puts(const char *s);
 */
 extern void uart0_puts_p(const char *s);
 
-extern void uart_printf(char *format, ...);
+extern void uart0_printf(char *format, ...);
 
 extern void uart_send(uint8_t *arr, uint16_t length);
 
@@ -342,6 +346,8 @@ extern void uart_send(uint8_t *arr, uint16_t length);
 *  @return  bytes waiting in the receive buffer
 */
 extern uint16_t uart0_available(void);
+
+extern uint16_t uart0_tx_available(void);
 
 /**
 *  @brief   Flush bytes waiting in receive buffer
@@ -367,6 +373,8 @@ extern void uart1_puts(const char *s);
 
 /** @brief  Put string from program memory to ringbuffer for transmitting via USART1 (only available on selected ATmega) @see uart_puts_p */
 extern void uart1_puts_p(const char *s);
+
+extern void uart1_printf(char *format, ...);
 
 /** @brief  Macro to automatically put a string constant into program memory of USART1 @see uart1_puts_p */
 #define uart1_puts_P(__s)       uart1_puts_p(PSTR(__s))
