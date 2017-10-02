@@ -20,7 +20,7 @@ enum addrs_e
 
 void init_addrs(void)
 {
-	DDRC &= ~((1 << DDC0) | (1 << DDC1) | (1 << DDC2));
+	DDRC |= ((1 << DDC0) | (1 << DDC1) | (1 << DDC2));
 	
 	return;
 }
@@ -60,11 +60,11 @@ int main(void)
 	while (1)
 	{
 		set_addr(cont);
-		//_delay_ms(300);
-		modbus_slave();		
+		modbus_slave();
+		_delay_ms(300);
 		cont++;
 		
-		if (cont == 3)
+		if (cont == 2)
 		{
 			cont = 0;
 		}
