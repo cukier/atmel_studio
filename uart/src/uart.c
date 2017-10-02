@@ -104,7 +104,7 @@ the "ISR" format introduced in AVR-Libc v1.4.0.
 *  constants and macros
 */
 
-#define UART_TX_BUFFER_SIZE 30
+#define UART_TX_BUFFER_SIZE 128
 
 /* size of RX/TX buffers */
 #define UART_RX0_BUFFER_MASK (UART_RX0_BUFFER_SIZE - 1)
@@ -563,7 +563,8 @@ void uart0_init(uint16_t baudrate)
 	#ifdef URSEL0
 	UCSR0C = (1<<URSEL0)|(3<<UCSZ00);
 	#else
-	UCSR0C = (3<<UCSZ00)|(1<<UPM01);
+	//UCSR0C = (3<<UCSZ00)|(1<<UPM01);
+	UCSR0C = (3<<UCSZ00);
 	#endif
 
 	#elif defined (ATMEGA_UART)
@@ -726,7 +727,7 @@ void uart0_puts_p(const char *progmem_s)
 }
 /* uart0_puts_p */
 
-void uart_printf(char *format, ...)
+void uart0_printf(char *format, ...)
 {
 	char uart_buffer[UART_TX_BUFFER_SIZE];
 	va_list args;
@@ -765,6 +766,16 @@ uint16_t uart0_available(void)
 	return ret;
 }
 /* uart0_available */
+
+uint16_t uart0_tx_available(void)
+{
+	uint16_t ret;
+
+	ATOMIC_BLOCK(ATOMIC_FORCEON) {
+		ret = (UART_RX0_BUFFER_SIZE + UART_TxHead - UART_TxTail) & UART_RX0_BUFFER_MASK;
+	}
+	return ret;
+}
 
 /*************************************************************************
 Function: uart0_flush()
@@ -1012,6 +1023,19 @@ void uart1_puts_p(const char *progmem_s)
 
 }
 /* uart1_puts_p */
+
+void uart1_printf(char *format, ...)
+{
+	char uart_buffer[UART_TX_BUFFER_SIZE];
+	va_list args;
+	
+	va_start(args, format);
+	vsnprintf(uart_buffer, UART_TX_BUFFER_SIZE, format, args);
+	va_end(args);
+	uart1_puts(uart_buffer);
+	
+	return;
+}
 
 /*************************************************************************
 Function: uart1_available()
