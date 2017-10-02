@@ -6,9 +6,9 @@
 
 int main(void)
 {
-	uart_init(UART_BAUD_SELECT(UART_BAUD_RATE, F_CPU));
+	uart1_init(UART_BAUD_SELECT(UART_BAUD_RATE, F_CPU));
 	_delay_ms(200);
-	uart_puts("Hello\n\r");
+	uart1_puts("Hello\n\r");
 	
 	while(1);
 	
