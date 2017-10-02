@@ -4,7 +4,7 @@
  * Created: 24/11/2016 23:43:47
  * Author : cuki
  */ 
-#define  F_CPU 16000000ULL
+#define  F_CPU 4000000ULL
 
 #include <avr/io.h>
 #include <util/delay.h>
