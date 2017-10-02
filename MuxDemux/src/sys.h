@@ -9,7 +9,8 @@
 #ifndef SYS_H_
 #define SYS_H_
 
-#define F_CPU				4000000ULL
-#define UART_BAUD_RATE      9600
+#define F_CPU					4000000ULL
+#define UART_BAUD_RATE_1		19200
+#define UART_BAUD_RATE_2		9600
 
 #endif /* SYS_H_ */

@@ -54,13 +54,14 @@ int main(void)
 	
 	cont = 0;
 	init_addrs();
-	modbus_init(1);
+	modbus_init(1, 1);
 	sei();
 	_delay_ms(300);
 
 	while (1)
 	{
 		set_addr(cont);
+		uart1_printf("End %u\n\r", cont);
 		//modbus_slave();
 		modbus_get_register(1, 0);
 		

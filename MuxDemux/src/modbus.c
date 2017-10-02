@@ -113,7 +113,8 @@ static const uint16_t wCRCTable[] = { 0X0000, 0XC0C1, 0XC181, 0X0140, 0XC301,
 	0X8C41, 0X4400, 0X84C1, 0X8581, 0X4540, 0X8701, 0X47C0, 0X4680, 0X8641,
 0X8201, 0X42C0, 0X4380, 0X8341, 0X4100, 0X81C1, 0X8081, 0X4040 };
 
-static volatile uint16_t m_address;
+static volatile uint16_t m_address_1;
+static volatile uint16_t m_address_2;
 static volatile bool modbus_err;
 
 bool modbus_get_err(void)
@@ -121,11 +122,12 @@ bool modbus_get_err(void)
 	return modbus_err;
 }
 
-bool modbus_init(uint16_t address)
+bool modbus_init(uint16_t add1, uint16_t add2)
 {
-	uart_init(UART_BAUD_SELECT(UART_BAUD_RATE, F_CPU));
-	uart1_init(UART_BAUD_SELECT(UART_BAUD_RATE, F_CPU));
-	m_address = address;
+	uart_init(UART_BAUD_SELECT(UART_BAUD_RATE_1, F_CPU));
+	uart1_init(UART_BAUD_SELECT(UART_BAUD_RATE_2, F_CPU));
+	m_address_1 = add1;
+	m_address_2 = add2;
 	mem_init();
 	
 	return true;
@@ -229,7 +231,7 @@ modbus_command_exception_code_t error) {
 		break;
 	}
 
-	resp[0] = m_address;
+	resp[0] = m_address_1;
 	resp[1] = ex_code;
 	resp[2] = error;
 	crc = CRC16(resp, 3);
@@ -269,7 +271,7 @@ bool modbus_slave(void) {
 		request_crc = ((request[index_rda - 1] << 8) | (request[index_rda - 2]));
 		my_crc = CRC16(request, index_rda - 2);
 
-		if ((m_address == request[MODBUS_FIELDS_ADDRESS]) && my_crc == request_crc)
+		if ((m_address_1 == request[MODBUS_FIELDS_ADDRESS]) && my_crc == request_crc)
 		{
 			switch (request[MODBUS_FIELDS_FUNCTION])
 			{
@@ -292,7 +294,7 @@ bool modbus_slave(void) {
 				else
 				{
 					b_count = 2 * register_value;
-					response[0] = m_address;
+					response[0] = m_address_1;
 					response[1] = READ_HOLDING_REGISTERS_COMMAND;
 					response[2] = (uint8_t) b_count;
 					mem_read_data(aux_addr, &response[3], b_count);
@@ -345,7 +347,7 @@ bool modbus_slave(void) {
 				else
 				{
 					mem_write_data(aux_addr, &request[7], b_count);
-					response[0] = m_address;
+					response[0] = m_address_1;
 					response[1] = WRITE_MULTIPLE_REGISTERS_COMMAND;
 					response[2] = (uint8_t) ((register_address & 0xFF00) >> 8);
 					response[3] = (uint8_t) (register_address & 0xFF);
@@ -441,6 +443,7 @@ uint16_t modbus_get_register(uint8_t slv_addr, uint16_t register_address)
 	
 	do
 	{
+		uart_flush();
 		make_read_request(slv_addr, register_address, 1, request);
 		uart_send(request, 8);
 		uart_flush();
