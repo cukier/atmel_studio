@@ -11,6 +11,9 @@
 
 #define F_CPU					4000000ULL
 #define UART_BAUD_RATE_1		19200
+
+#ifdef USART1_ENABLED
 #define UART_BAUD_RATE_2		9600
+#endif
 
 #endif /* SYS_H_ */

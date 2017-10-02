@@ -122,12 +122,24 @@ bool modbus_get_err(void)
 	return modbus_err;
 }
 
+#ifdef USART1_ENABLED
 bool modbus_init(uint16_t add1, uint16_t add2)
+#else
+bool modbus_init(uint16_t add1)
+#endif
 {
 	uart_init(UART_BAUD_SELECT(UART_BAUD_RATE_1, F_CPU));
+	
+	#ifdef USART1_ENABLED
 	uart1_init(UART_BAUD_SELECT(UART_BAUD_RATE_2, F_CPU));
+	#endif
+	
 	m_address_1 = add1;
+	
+	#ifdef USART1_ENABLED
 	m_address_2 = add2;
+	#endif
+	
 	mem_init();
 	
 	return true;
@@ -252,11 +264,11 @@ bool modbus_slave(void) {
 	ret = false;
 	index_rda = 0;
 	
-	do 
+	do
 	{
 		index_rda = uart_available();
 		_delay_ms(100);
-	} while (index_rda != uart_available());	
+	} while (index_rda != uart_available());
 
 	if (index_rda != 0) {
 		_delay_ms(100);
@@ -451,7 +463,9 @@ uint16_t modbus_get_register(uint8_t slv_addr, uint16_t register_address)
 		n = 0;
 		n = uart_get_rx_size();
 		
+		#ifdef USART1_ENABLED
 		uart1_printf("Recebido %u\n\r", n);
+		#endif
 		
 		if (n == 7)
 		{
@@ -486,7 +500,7 @@ void modbus_set_register(uint8_t slv_addr, uint16_t register_address, uint16_t v
 	uart_send(request, 8);
 	_delay_ms(DELAY_REQUEST);
 	n = 0;
-	n = uart_get_rx_size();	
+	n = uart_get_rx_size();
 	modbus_err = (n != 0);
 	uart_flush();
 	

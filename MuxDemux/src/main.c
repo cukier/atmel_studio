@@ -54,14 +54,23 @@ int main(void)
 	
 	cont = 0;
 	init_addrs();
+	#ifdef USART1_ENABLED
 	modbus_init(1, 1);
+	#else
+	modbus_init(1);
+	#endif
+	
 	sei();
 	_delay_ms(300);
 
 	while (1)
 	{
 		set_addr(cont);
+		
+		#ifdef USART1_ENABLED
 		uart1_printf("End %u\n\r", cont);
+		#endif
+		
 		//modbus_slave();
 		modbus_get_register(1, 0);
 		
