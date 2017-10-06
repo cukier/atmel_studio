@@ -14,28 +14,57 @@
 #include <util/delay.h>
 #include <avr/interrupt.h>
 #include <stdlib.h>
+#include <stdarg.h>
+#include <stdio.h>
+
+#ifdef DEBUG
+void debug_msg(const char *str, ...)
+{
+	va_list args;
+	char uart_buffer[127];
+	
+	va_start(args, str);
+	vsnprintf(uart_buffer, 127, str, args);
+	va_end(args);
+	SET(SERIAL_ADR);
+	_delay_ms(1);
+	uart0_puts(uart_buffer);
+	_delay_ms(100);
+	RESET(SERIAL_ADR);
+	_delay_ms(1);
+	
+	return;
+}
+#endif
+
+void init(void)
+{
+	
+	#ifdef DEBUG
+	SET_OUTPUT(SERIAL_ADR);
+	#endif
+	
+	modbus_init(1);
+	sei();
+	_delay_ms(300);
+	#ifdef DEBUG
+	debug_msg("Inicio\n\r");
+	#endif
+	
+	return;
+}
 
 int main(void)
 {
-	//uint8_t cont;
-	//uint16_t leit;
-	
-	//leit = 0;
-	//cont = 0;
-	modbus_init(1);
-	//uart_init(UART_BAUD_SELECT(UART_BAUD_RATE, F_CPU));
-	sei();
-	_delay_ms(300);
-	uart_puts("Hello\n");
+	init();
 	
 	while (1)
 	{
+		#ifdef DEBUG
+		RESET(SERIAL_ADR);
+		_delay_ms(1);
+		#endif
 		modbus_slave();
-		//leit = modbus_get_register(1, 0);
-		//modbus_set_register(1, 1, cont++);
-		//_delay_ms(10);
-		//modbus_set_register(1, 2, leit);
-		//_delay_ms(1000);
 	}
 	
 	return 0;

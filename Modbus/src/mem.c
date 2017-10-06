@@ -10,7 +10,7 @@ bool mem_init()
 {
 	#ifdef USE_EXTERNAL_EEPROM
 	TWIInit();
-	eeprom_init();
+	ext_eprom_init();
 	#endif
 	return true;
 }
@@ -18,7 +18,7 @@ bool mem_init()
 bool mem_ready()
 {
 	#ifdef USE_EXTERNAL_EEPROM
-	return eeprom_ready();
+	return ext_eprom_ready();
 	#endif
 	
 	return true;
@@ -27,7 +27,7 @@ bool mem_ready()
 bool mem_read_data(uint16_t address, uint8_t *data, uint16_t size)
 {
 	#ifdef USE_EXTERNAL_EEPROM
-	return eeprom_read_data(address, data, size);
+	return ext_eprom_read_data(address, data, size);
 	#else
 	
 	while (size--)
@@ -42,7 +42,7 @@ bool mem_read_data(uint16_t address, uint8_t *data, uint16_t size)
 bool mem_write_data(uint16_t address, uint8_t *data, uint16_t size)
 {
 	#ifdef USE_EXTERNAL_EEPROM
-	return eeprom_write_data(address, data, size);
+	return ext_eprom_write_data(address, data, size);
 	#else
 	
 	while (size--)
@@ -57,7 +57,7 @@ bool mem_write_data(uint16_t address, uint8_t *data, uint16_t size)
 uint32_t mem_get_size(void)
 {
 	#ifdef USE_EXTERNAL_EEPROM
-	return eeprom_get_size();
+	return ext_eprom_get_size();
 	#endif
 	
 	return 1024;

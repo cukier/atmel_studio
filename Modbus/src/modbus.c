@@ -113,7 +113,8 @@ static const uint16_t wCRCTable[] = { 0X0000, 0XC0C1, 0XC181, 0X0140, 0XC301,
 	0X8C41, 0X4400, 0X84C1, 0X8581, 0X4540, 0X8701, 0X47C0, 0X4680, 0X8641,
 0X8201, 0X42C0, 0X4380, 0X8341, 0X4100, 0X81C1, 0X8081, 0X4040 };
 
-static volatile uint16_t m_address;
+static volatile uint16_t m_address_1;
+static volatile uint16_t m_address_2;
 static volatile bool modbus_err;
 
 bool modbus_get_err(void)
@@ -121,23 +122,27 @@ bool modbus_get_err(void)
 	return modbus_err;
 }
 
-bool modbus_init(uint16_t address)
-{
-	uart_init(UART_BAUD_SELECT(UART_BAUD_RATE, F_CPU));
-	m_address = address;
+#ifdef USART1_ENABLED
+bool modbus_init(uint16_t add1, uint16_t add2)
+#else
+bool modbus_init(uint16_t add1)
+#endif
+{	
+	uart_init(UART_BAUD_SELECT(BAUD, F_CPU));
+	
+	#ifdef USART1_ENABLED
+	uart1_init(UART_BAUD_SELECT(BAUD_2, F_CPU));
+	#endif
+	
+	m_address_1 = add1;
+	
+	#ifdef USART1_ENABLED
+	m_address_2 = add2;
+	#endif
+	
 	mem_init();
 	
 	return true;
-}
-
-uint16_t make16(uint8_t varhigh, uint8_t varlow)
-{
-	return (uint16_t) (varhigh & 0xff) * 0x100 + (varlow & 0xff);
-}
-
-uint8_t make8(uint32_t var, uint8_t offset)
-{
-	return (uint8_t) (((var >> (offset * 8)) & 0xff));
 }
 
 uint16_t CRC16(uint8_t *nData, uint16_t wLength)
@@ -228,7 +233,7 @@ modbus_command_exception_code_t error) {
 		break;
 	}
 
-	resp[0] = m_address;
+	resp[0] = m_address_1;
 	resp[1] = ex_code;
 	resp[2] = error;
 	crc = CRC16(resp, 3);
@@ -245,12 +250,18 @@ bool modbus_slave(void) {
 	uint16_t register_value, register_address, b_count, cont,
 	request_crc, aux_addr, index_rda, my_crc;
 	bool ret;
-
 	ret = false;
 	index_rda = 0;
-	index_rda = uart_available();
+	
+	do
+	{
+		index_rda = uart_available();
+		_delay_ms(100);
+	} while (index_rda != uart_available());
 
 	if (index_rda != 0) {
+		_delay_ms(100);
+		index_rda = uart_available();
 		uart_get(request, index_rda);
 		register_value = (request[MODBUS_FIELDS_REGISTER_VALUE_H] << 8) |
 		request[MODBUS_FIELDS_REGISTER_VALUE_L];
@@ -261,7 +272,7 @@ bool modbus_slave(void) {
 		request_crc = ((request[index_rda - 1] << 8) | (request[index_rda - 2]));
 		my_crc = CRC16(request, index_rda - 2);
 
-		if ((m_address == request[MODBUS_FIELDS_ADDRESS]) && my_crc == request_crc)
+		if ((m_address_1 == request[MODBUS_FIELDS_ADDRESS]) && my_crc == request_crc)
 		{
 			switch (request[MODBUS_FIELDS_FUNCTION])
 			{
@@ -284,7 +295,7 @@ bool modbus_slave(void) {
 				else
 				{
 					b_count = 2 * register_value;
-					response[0] = m_address;
+					response[0] = m_address_1;
 					response[1] = READ_HOLDING_REGISTERS_COMMAND;
 					response[2] = (uint8_t) b_count;
 					mem_read_data(aux_addr, &response[3], b_count);
@@ -337,7 +348,7 @@ bool modbus_slave(void) {
 				else
 				{
 					mem_write_data(aux_addr, &request[7], b_count);
-					response[0] = m_address;
+					response[0] = m_address_1;
 					response[1] = WRITE_MULTIPLE_REGISTERS_COMMAND;
 					response[2] = (uint8_t) ((register_address & 0xFF00) >> 8);
 					response[3] = (uint8_t) (register_address & 0xFF);
@@ -352,6 +363,8 @@ bool modbus_slave(void) {
 				break;
 			}
 		}
+		
+		_delay_ms(500);
 	}
 
 	return ret;
@@ -426,11 +439,12 @@ uint16_t modbus_get_register(uint8_t slv_addr, uint16_t register_address)
 	uint8_t response[7];
 	uint8_t tries;
 	
-	tries = TENTATIVAS - 1;
+	tries = TENTATIVAS;
 	modbus_err = false;
 	
 	do
 	{
+		uart_flush();
 		make_read_request(slv_addr, register_address, 1, request);
 		uart_send(request, 8);
 		uart_flush();
@@ -440,7 +454,7 @@ uint16_t modbus_get_register(uint8_t slv_addr, uint16_t register_address)
 		
 		if (n == 7)
 		{
-			break;
+			tries = 1;
 		}
 		else
 		{
@@ -452,7 +466,7 @@ uint16_t modbus_get_register(uint8_t slv_addr, uint16_t register_address)
 				return 0xFFFF;
 			}
 		}
-	} while (tries--);
+	} while (--tries);
 	
 	uart_get(response, 7);
 	ret = make16(response[3], response[4]);
@@ -471,7 +485,7 @@ void modbus_set_register(uint8_t slv_addr, uint16_t register_address, uint16_t v
 	uart_send(request, 8);
 	_delay_ms(DELAY_REQUEST);
 	n = 0;
-	n = uart_get_rx_size();	
+	n = uart_get_rx_size();
 	modbus_err = (n != 0);
 	uart_flush();
 	

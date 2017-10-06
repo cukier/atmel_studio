@@ -26,7 +26,12 @@
 #define TENTATIVAS			4
 #endif
 
-bool modbus_init(uint16_t address);
+#ifdef USART1_ENABLED
+bool modbus_init(uint16_t add1, uint16_t add2);
+#else
+bool modbus_init(uint16_t add1);
+#endif
+
 bool modbus_slave(void);
 uint16_t modbus_get_register(uint8_t slv_addr, uint16_t register_address);
 void modbus_set_register(uint8_t slv_addr, uint16_t register_address, uint16_t value);
