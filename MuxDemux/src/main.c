@@ -66,7 +66,7 @@ int main(void)
 	while (1)
 	{
 		set_addr(cont);
-		
+		_delay_ms(1);
 		#ifdef USART1_ENABLED
 		uart1_printf("End %u\n\r", cont);
 		#endif
@@ -85,6 +85,8 @@ int main(void)
 		{
 			cont = 0;
 		}
+		
+		PORTC ^= (1 << PORTC1);
 	}
 
 	return 0;

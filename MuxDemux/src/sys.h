@@ -13,7 +13,7 @@
 #define UART_BAUD_RATE_1		19200
 
 #ifdef USART1_ENABLED
-#define UART_BAUD_RATE_2		9600
+#define UART_BAUD_RATE_2		19200
 #endif
 
 #endif /* SYS_H_ */
