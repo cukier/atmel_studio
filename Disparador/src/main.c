@@ -13,12 +13,16 @@ enum seq_e
 
 uint8_t cont;
 uint8_t saida;
+uint16_t timestamp;
+uint16_t subida;
+uint16_t descida;
 
 #define RGE		215
 
 ISR(TIMER0_OVF_vect)
 {
 	TCNT0 = RGE;
+	timestamp++;
 	
 	switch(saida)
 	{
