@@ -3,8 +3,7 @@
 
 #define F_CPU			4000000ULL
 #define BAUD			9600
-#define PONTO(x)		_ponto(x)
-#define _ponto(x)		PONTO_ ## x
+//#define swap(v)			((v << 8) | (v >> 8))
 
 #define PONTO_1			A,0
 #define	PONTO_2			A,2

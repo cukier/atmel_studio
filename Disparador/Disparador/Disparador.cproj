@@ -125,6 +125,14 @@
       <SubType>compile</SubType>
       <Link>main.c</Link>
     </Compile>
+    <Compile Include="..\src\mem.c">
+      <SubType>compile</SubType>
+      <Link>mem.c</Link>
+    </Compile>
+    <Compile Include="..\src\mem.h">
+      <SubType>compile</SubType>
+      <Link>mem.h</Link>
+    </Compile>
     <Compile Include="..\src\sys.h">
       <SubType>compile</SubType>
       <Link>sys.h</Link>

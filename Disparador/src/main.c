@@ -1,5 +1,6 @@
 #include "sys.h"
 #include "utils.h"
+#include "mem.h"
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -7,62 +8,205 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-enum seq_e
+#define PRG_MAX				32
+#define ONE_SEC				10
+#define HALF_SEC			(ONE_SEC >> 1)
+#define RGE					215
+#define to_timestamp(x)		(x * ONE_SEC)
+#define from_timestamp(x)	(x / ONE_SEC)
+
+enum estado_e
 {
-	PA, PB, PC, PD
+	PARADO,
+	EXECUTANDO,
+	ERRO
 };
 
-uint8_t cont;
-uint8_t saida;
-uint16_t timestamp;
+enum addr_e
+{
+	COMANDO,
+	PROG,
+	ESTADO = 33
+};
+
+uint32_t timestamp;
 uint16_t subida;
 uint16_t descida;
+uint16_t programa_atual;
+uint16_t programa[PRG_MAX];
 
-#define RGE		215
+void exec_io(bool dir)
+{
+	switch (programa_atual)
+	{
+		case 0:
+		if (dir) SET(PONTO_1); else RESET(PONTO_1);
+		break;
+		
+		case 1:
+		if (dir) SET(PONTO_2); else RESET(PONTO_2);
+		break;
+		
+		case 2:
+		if (dir) SET(PONTO_3); else RESET(PONTO_3);
+		break;
+		
+		case 3:
+		if (dir) SET(PONTO_4); else RESET(PONTO_4);
+		break;
+		
+		case 4:
+		if (dir) SET(PONTO_5); else RESET(PONTO_5);
+		break;
+		
+		case 5:
+		if (dir) SET(PONTO_6); else RESET(PONTO_6);
+		break;
+		
+		case 6:
+		if (dir) SET(PONTO_7); else RESET(PONTO_7);
+		break;
+		
+		case 7:
+		if (dir) SET(PONTO_8); else RESET(PONTO_8);
+		break;
+		
+		case 8:
+		if (dir) SET(PONTO_9); else RESET(PONTO_9);
+		break;
+		
+		case 9:
+		if (dir) SET(PONTO_10); else RESET(PONTO_10);
+		break;
+		
+		case 10:
+		if (dir) SET(PONTO_11); else RESET(PONTO_11);
+		break;
+		
+		case 11:
+		if (dir) SET(PONTO_12); else RESET(PONTO_12);
+		break;
+		
+		case 12:
+		if (dir) SET(PONTO_13); else RESET(PONTO_13);
+		break;
+		
+		case 13:
+		if (dir) SET(PONTO_14); else RESET(PONTO_14);
+		break;
+		
+		case 14:
+		if (dir) SET(PONTO_15); else RESET(PONTO_15);
+		break;
+		
+		case 15:
+		if (dir) SET(PONTO_16); else RESET(PONTO_16);
+		break;
+		
+		case 16:
+		if (dir) SET(PONTO_17); else RESET(PONTO_17);
+		break;
+		
+		case 17:
+		if (dir) SET(PONTO_18); else RESET(PONTO_18);
+		break;
+		
+		case 18:
+		if (dir) SET(PONTO_19); else RESET(PONTO_19);
+		break;
+		
+		case 19:
+		if (dir) SET(PONTO_20); else RESET(PONTO_20);
+		break;
+		
+		case 20:
+		if (dir) SET(PONTO_21); else RESET(PONTO_21);
+		break;
+		
+		case 21:
+		if (dir) SET(PONTO_22); else RESET(PONTO_22);
+		break;
+		
+		case 22:
+		if (dir) SET(PONTO_23); else RESET(PONTO_23);
+		break;
+		
+		case 23:
+		if (dir) SET(PONTO_24); else RESET(PONTO_24);
+		break;
+		
+		case 24:
+		if (dir) SET(PONTO_25); else RESET(PONTO_25);
+		break;
+		
+		case 25:
+		if (dir) SET(PONTO_26); else RESET(PONTO_26);
+		break;
+		
+		case 26:
+		if (dir) SET(PONTO_27); else RESET(PONTO_27);
+		break;
+		
+		case 27:
+		if (dir) SET(PONTO_28); else RESET(PONTO_28);
+		break;
+		
+		case 28:
+		if (dir) SET(PONTO_29); else RESET(PONTO_29);
+		break;
+		
+		case 29:
+		if (dir) SET(PONTO_30); else RESET(PONTO_30);
+		break;
+		
+		case 30:
+		if (dir) SET(PONTO_31); else RESET(PONTO_31);
+		break;
+		
+		case 31:
+		if (dir) SET(PONTO_32); else RESET(PONTO_32);
+		break;
+		
+		default:
+		break;
+	}
+}
+
+void carrega_programa(void)
+{
+	subida = timestamp + programa[programa_atual];
+	//descida = subida + HALF_SEC;
+	//programa_atual++;
+}
 
 ISR(TIMER0_OVF_vect)
 {
 	TCNT0 = RGE;
 	timestamp++;
 	
-	switch(saida)
+	if (timestamp == subida)
 	{
-		case PA:
-		PORTB = PORTC = PORTD = 0;
-		PORTA = (1 << cont++);
-		break;
-		
-		case PB:
-		PORTA = PORTC = PORTD = 0;
-		PORTB = (1 << cont++);
-		break;
-		
-		case PC:
-		PORTA = PORTB = PORTD = 0;
-		PORTC = (1 << cont++);
-		break;
-		
-		case PD:
-		PORTA = PORTB = PORTC = 0;
-		PORTD = (1 << cont++);
-		break;
+		//carrega_programa();
+		descida = subida + HALF_SEC;
+		exec_io(true);
 	}
-	
-	
-	if (cont == 8)
+	else if (timestamp == descida)
 	{
-		cont = 0;
-		saida++;
-		
-		if (saida == 4)
-		{
-			saida = 0;
-		}
+		exec_io(false);
+		programa_atual++;
+		carrega_programa();
 	}
 }
 
 void init(void)
 {
+	uint16_t i;
+	
+	timestamp = 0;
+	programa_atual = 0;
+	subida = 0;
+	descida = 0;
+	
 	SET_OUTPUT(PONTO_1);
 	SET_OUTPUT(PONTO_2);
 	SET_OUTPUT(PONTO_3);
@@ -96,40 +240,81 @@ void init(void)
 	SET_OUTPUT(PONTO_31);
 	SET_OUTPUT(PONTO_32);
 	SET_INPUT(BOTAO);
-	//timer0
-	//TCNT0 = RGE;
-	//TCCR0A = 0;
-	//TCCR0B = (1 << CS00) | (1 << CS02);
-	//TIMSK0 = (1 << TOIE0);
+	
+	for (i = 0; i < PRG_MAX; ++i)
+	{
+		programa[i] = mem_read_word(PROG + i);
+		
+		if (programa[i] == UINT16_MAX)
+		{
+			programa[i] = (uint16_t) to_timestamp(10);
+			mem_write_word(PROG + i, programa[i]);
+		}
+	}
+	
+	carrega_programa();
 	
 	sei();
+}
+
+void desliga_programa(void)
+{
+	TCNT0 = 0;
+	TCCR0A = 0;
+	TCCR0B = 0;
+	TIMSK0 = 0;
+	timestamp = 0;
+	programa_atual = 0;
+	subida = 0;
+	descida = 0;
+	carrega_programa();
+}
+
+void liga_programa(void)
+{
+	TCNT0 = RGE;
+	TCCR0A = 0;
+	TCCR0B = (1 << CS00) | (1 << CS02);
+	TIMSK0 = (1 << TOIE0);
 }
 
 int main(void)
 {
 	bool ctrl;
+	bool liga_desliga;
 	
 	ctrl = true;
-	cont = 0;
-	saida = 0;
+	liga_desliga = false;
 	init();
 	
 	while (true)
 	{
 		if (!IS_SET(BOTAO))
 		{
-			if (ctrl)
+			_delay_ms(100);
+			
+			if (!IS_SET(BOTAO))
 			{
-				ctrl = false;
-				TCNT0 = RGE;
-				TCCR0A = 0;
-				TCCR0B = (1 << CS00) | (1 << CS02);
-				TIMSK0 = (1 << TOIE0);
+				if (ctrl)
+				{
+					ctrl = false;
+					
+					if (liga_desliga)
+					{
+						liga_desliga = false;
+						liga_programa();
+					}
+					else
+					{
+						liga_desliga = true;
+						desliga_programa();
+					}
+				}
 			}
-		}
-		else if (!ctrl)
-		{
-			ctrl = true;
+			else if (!ctrl)
+			{
+				ctrl = true;
+			}
 		}
 	}
 	
