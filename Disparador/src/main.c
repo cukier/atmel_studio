@@ -1,6 +1,7 @@
 #include "sys.h"
 #include "utils.h"
 #include "mem.h"
+#include "uart.h"
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -9,11 +10,12 @@
 #include <stdbool.h>
 
 #define PRG_MAX				32
-#define ONE_SEC				10
+#define ONE_SEC				100
 #define HALF_SEC			(ONE_SEC >> 1)
 #define RGE					215
 #define to_timestamp(x)		(x * ONE_SEC)
 #define from_timestamp(x)	(x / ONE_SEC)
+#define VERSION				"V 0.1"
 
 enum estado_e
 {
@@ -179,6 +181,19 @@ void carrega_programa(void)
 	//programa_atual++;
 }
 
+void desliga_programa(void)
+{
+	TCNT0 = 0;
+	TCCR0A = 0;
+	TCCR0B = 0;
+	TIMSK0 = 0;
+	timestamp = 0;
+	programa_atual = 0;
+	subida = 0;
+	descida = 0;
+	carrega_programa();
+}
+
 ISR(TIMER0_OVF_vect)
 {
 	TCNT0 = RGE;
@@ -189,12 +204,17 @@ ISR(TIMER0_OVF_vect)
 		//carrega_programa();
 		descida = subida + HALF_SEC;
 		exec_io(true);
+		uart_printf("Disparo Prog %u\n\r", programa_atual);
 	}
 	else if (timestamp == descida)
 	{
 		exec_io(false);
 		programa_atual++;
+		
+		if (programa_atual < PRG_MAX)
 		carrega_programa();
+		else
+		desliga_programa();
 	}
 }
 
@@ -240,6 +260,13 @@ void init(void)
 	SET_OUTPUT(PONTO_31);
 	SET_OUTPUT(PONTO_32);
 	SET_INPUT(BOTAO);
+
+
+	uart_init(UART_BAUD_SELECT(BAUD, F_CPU));
+	sei();
+	_delay_ms(100);
+	uart_printf("Versao %s\n\r", VERSION);
+	
 	
 	for (i = 0; i < PRG_MAX; ++i)
 	{
@@ -247,26 +274,11 @@ void init(void)
 		
 		if (programa[i] == UINT16_MAX)
 		{
-			programa[i] = (uint16_t) to_timestamp(10);
+			programa[i] = (uint16_t) (2 * ONE_SEC);
 			mem_write_word(PROG + i, programa[i]);
 		}
 	}
 	
-	carrega_programa();
-	
-	sei();
-}
-
-void desliga_programa(void)
-{
-	TCNT0 = 0;
-	TCCR0A = 0;
-	TCCR0B = 0;
-	TIMSK0 = 0;
-	timestamp = 0;
-	programa_atual = 0;
-	subida = 0;
-	descida = 0;
 	carrega_programa();
 }
 
@@ -284,7 +296,7 @@ int main(void)
 	bool liga_desliga;
 	
 	ctrl = true;
-	liga_desliga = false;
+	liga_desliga = true;
 	init();
 	
 	while (true)
@@ -303,11 +315,13 @@ int main(void)
 					{
 						liga_desliga = false;
 						liga_programa();
+						uart_printf("Ligado\n\r");
 					}
 					else
 					{
 						liga_desliga = true;
 						desliga_programa();
+						uart_printf("Desligado\n\r");
 					}
 				}
 			}

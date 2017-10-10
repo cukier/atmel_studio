@@ -137,6 +137,14 @@
       <SubType>compile</SubType>
       <Link>sys.h</Link>
     </Compile>
+    <Compile Include="..\src\uart.c">
+      <SubType>compile</SubType>
+      <Link>uart.c</Link>
+    </Compile>
+    <Compile Include="..\src\uart.h">
+      <SubType>compile</SubType>
+      <Link>uart.h</Link>
+    </Compile>
     <Compile Include="..\src\utils.h">
       <SubType>compile</SubType>
       <Link>utils.h</Link>

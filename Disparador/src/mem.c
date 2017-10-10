@@ -33,18 +33,20 @@ uint16_t mem_read_word(uint16_t address)
 	#ifdef USE_EXTERNAL_EEPROM
 	ext_eprom_read_data(address * 2, (uint8_t *) &ret, 2);
 	#else
-	ret = swap(eeprom_read_word((uint16_t *) (2 * address)));
+	//ret = swap(eeprom_read_word((uint16_t *) (2 * address)));
+	ret = eeprom_read_word((uint16_t *) (2 * address));
 	#endif
 	
 	return ret;
 }
 
 void mem_write_word(uint16_t address, uint16_t value)
-{	
+{
 	#ifdef USE_EXTERNAL_EEPROM
 	ext_eprom_write_data(address * 2, (uint8_t *) &value, 2);
 	#else
-	eeprom_write_word((uint16_t *) (2 * address), swap(value));
+	//eeprom_write_word((uint16_t *) (2 * address), swap(value));
+	eeprom_write_word((uint16_t *) (2 * address), value);
 	#endif
 	
 	return;
