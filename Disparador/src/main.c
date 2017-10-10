@@ -1,4 +1,5 @@
 #include "sys.h"
+#include "utils.h"
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -62,27 +63,74 @@ ISR(TIMER0_OVF_vect)
 
 void init(void)
 {
-	//DDRB &= ~(1 << DDB0);
-	DDRC = 0xFF;
-	DDRD = 0xFF;
-	
-	TCNT0 = RGE;
-	TCCR0A = 0;
-	TCCR0B = (1 << CS00) | (1 << CS02);
-	TIMSK0 = (1 << TOIE0);
+	SET_OUTPUT(PONTO_1);
+	SET_OUTPUT(PONTO_2);
+	SET_OUTPUT(PONTO_3);
+	SET_OUTPUT(PONTO_4);
+	SET_OUTPUT(PONTO_5);
+	SET_OUTPUT(PONTO_6);
+	SET_OUTPUT(PONTO_7);
+	SET_OUTPUT(PONTO_8);
+	SET_OUTPUT(PONTO_9);
+	SET_OUTPUT(PONTO_10);
+	SET_OUTPUT(PONTO_11);
+	SET_OUTPUT(PONTO_12);
+	SET_OUTPUT(PONTO_13);
+	SET_OUTPUT(PONTO_14);
+	SET_OUTPUT(PONTO_15);
+	SET_OUTPUT(PONTO_16);
+	SET_OUTPUT(PONTO_17);
+	SET_OUTPUT(PONTO_18);
+	SET_OUTPUT(PONTO_19);
+	SET_OUTPUT(PONTO_20);
+	SET_OUTPUT(PONTO_21);
+	SET_OUTPUT(PONTO_22);
+	SET_OUTPUT(PONTO_23);
+	SET_OUTPUT(PONTO_24);
+	SET_OUTPUT(PONTO_25);
+	SET_OUTPUT(PONTO_26);
+	SET_OUTPUT(PONTO_27);
+	SET_OUTPUT(PONTO_28);
+	SET_OUTPUT(PONTO_29);
+	SET_OUTPUT(PONTO_30);
+	SET_OUTPUT(PONTO_31);
+	SET_OUTPUT(PONTO_32);
+	SET_INPUT(BOTAO);
+	//timer0
+	//TCNT0 = RGE;
+	//TCCR0A = 0;
+	//TCCR0B = (1 << CS00) | (1 << CS02);
+	//TIMSK0 = (1 << TOIE0);
 	
 	sei();
 }
 
 int main(void)
 {
+	bool ctrl;
+	
+	ctrl = true;
 	cont = 0;
 	saida = 0;
 	init();
 	
 	while (true)
 	{
-		
+		if (!IS_SET(BOTAO))
+		{
+			if (ctrl)
+			{
+				ctrl = false;
+				TCNT0 = RGE;
+				TCCR0A = 0;
+				TCCR0B = (1 << CS00) | (1 << CS02);
+				TIMSK0 = (1 << TOIE0);
+			}
+		}
+		else if (!ctrl)
+		{
+			ctrl = true;
+		}
 	}
 	
 	return 0;
