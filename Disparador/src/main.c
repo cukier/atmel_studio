@@ -197,6 +197,7 @@ void desliga_programa(void)
 ISR(TIMER0_OVF_vect)
 {
 	TCNT0 = RGE;
+	TOGGLE(PONTO_TESTE);
 	timestamp++;
 	
 	if (timestamp == subida)
@@ -259,6 +260,7 @@ void init(void)
 	SET_OUTPUT(PONTO_30);
 	SET_OUTPUT(PONTO_31);
 	SET_OUTPUT(PONTO_32);
+	SET_OUTPUT(PONTO_TESTE);
 	SET_INPUT(BOTAO);
 
 

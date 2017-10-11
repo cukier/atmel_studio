@@ -1,7 +1,7 @@
 #ifndef SYS_H
 #define SYS_H
 
-#define F_CPU			4000000ULL
+#define F_CPU			16000000ULL
 #define BAUD			9600
 //#define swap(v)			((v << 8) | (v >> 8))
 
@@ -37,6 +37,7 @@
 #define	PONTO_30		K,0
 #define	PONTO_31		K,1
 #define	PONTO_32		K,2
+#define PONTO_TESTE		F,0
 #define BOTAO			K,7
 
 
