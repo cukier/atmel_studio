@@ -35,7 +35,7 @@
 #define PONTO_30      A8
 #define PONTO_31      A9
 #define PONTO_32      A10
-#define PONTO_TESTE   A8
+#define PONTO_TESTE   A14
 #define BOTAO         A15
 
 bool ctrl, sent, liga_desliga;
