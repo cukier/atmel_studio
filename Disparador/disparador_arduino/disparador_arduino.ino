@@ -2,6 +2,7 @@
 #define _100_MS       100
 #define _500_MS       500
 #define _ONE_SEC      1000
+#define VERSAO        "2"
 
 #define PONTO_1       22
 #define PONTO_2       24
@@ -35,26 +36,31 @@
 #define PONTO_30      A8
 #define PONTO_31      A9
 #define PONTO_32      A10
-#define PONTO_TESTE   A14
+//#define PONTO_TESTE   A14
 #define BOTAO         A15
 
 bool ctrl, sent, liga_desliga;
 uint8_t programa_atual;
-uint64_t timestamp, subida, descida;
-uint32_t programa[NR_PRG] = { 2 * _ONE_SEC, 2 * _ONE_SEC, 2 * _ONE_SEC, 2 * _ONE_SEC,
-                              2 * _ONE_SEC, 2 * _ONE_SEC, 2 * _ONE_SEC, 2 * _ONE_SEC,
-                              2 * _ONE_SEC, 2 * _ONE_SEC, 2 * _ONE_SEC, 2 * _ONE_SEC,
-                              2 * _ONE_SEC, 2 * _ONE_SEC, 2 * _ONE_SEC, 2 * _ONE_SEC,
-                              2 * _ONE_SEC, 2 * _ONE_SEC, 2 * _ONE_SEC, 2 * _ONE_SEC,
-                              2 * _ONE_SEC, 2 * _ONE_SEC, 2 * _ONE_SEC, 2 * _ONE_SEC,
-                              2 * _ONE_SEC, 2 * _ONE_SEC, 2 * _ONE_SEC, 2 * _ONE_SEC,
-                              2 * _ONE_SEC, 2 * _ONE_SEC, 2 * _ONE_SEC, 2 * _ONE_SEC
+uint32_t timestamp, subida, descida;
+//vetor que recebe todo os 32 tempos, separado por virgula
+//o valor eh a quantidade de milisegundos a partir de
+//pressionado o botao
+uint32_t programa[NR_PRG] = { 1 * _ONE_SEC, 2 * _ONE_SEC, 3 * _ONE_SEC, 4 * _ONE_SEC,
+                              5 * _ONE_SEC, 6 * _ONE_SEC, 7 * _ONE_SEC, 8 * _ONE_SEC,
+                              9 * _ONE_SEC, 10 * _ONE_SEC, 11 * _ONE_SEC, 12 * _ONE_SEC,
+                              13 * _ONE_SEC, 14 * _ONE_SEC, 15 * _ONE_SEC, 16 * _ONE_SEC,
+                              17 * _ONE_SEC, 18 * _ONE_SEC, 19 * _ONE_SEC, 20 * _ONE_SEC,
+                              21 * _ONE_SEC, 22 * _ONE_SEC, 23 * _ONE_SEC, 24 * _ONE_SEC,
+                              25 * _ONE_SEC, 26 * _ONE_SEC, 27 * _ONE_SEC, 28 * _ONE_SEC,
+                              29 * _ONE_SEC, 30 * _ONE_SEC, 31 * _ONE_SEC, 32 * _ONE_SEC
                             };
-
+//carrega a proxima borda de subida
 void carrega_programa() {
-  subida = timestamp + programa[programa_atual];
+  //subida = timestamp + programa[programa_atual];
+  subida = programa[programa_atual];
+  descida = subida + 10;
 }
-
+//para e reinicia o programa
 void parar_programa() {
   timestamp = 0;
   programa_atual = 0;
@@ -64,9 +70,10 @@ void parar_programa() {
   TIMSK0 &= ~(_BV(OCIE0A));
   digitalWrite(LED_BUILTIN, LOW);
 }
-
+//inicializacao mcu
 void setup() {
   Serial.begin(9600);
+  pinMode(LED_BUILTIN, OUTPUT);
   pinMode(PONTO_1, OUTPUT);
   pinMode(PONTO_2, OUTPUT);
   pinMode(PONTO_3, OUTPUT);
@@ -105,10 +112,19 @@ void setup() {
   ctrl = true;
   sent = true;
 
-  Serial.println("Inicio");
+  Serial.print("Inicio ");
+  Serial.print(VERSAO);
+  Serial.println();
 }
-
+//aciona ou desliga a saida do programa atual
+//var liga_desliga controla o sentido
 void executa_programa() {
+  // Serial.print("Executando programa ");
+  // Serial.print(programa_atual);
+  // Serial.print(" L/D ");
+  // Serial.print(liga_desliga);
+  // Serial.println();
+
   switch (programa_atual) {
     case 0:
       if (liga_desliga) digitalWrite(PONTO_1, HIGH); else digitalWrite(PONTO_1, LOW);
@@ -208,14 +224,15 @@ void executa_programa() {
       break;
   }
 }
-
+//acontece a cada 1ms
+//relogio do programa
 SIGNAL(TIMER0_COMPA_vect)
 {
-  if (!(timestamp % _ONE_SEC)) {
-    digitalWrite(LED_BUILTIN, !(digitalRead(LED_BUILTIN)));
+  if (!(timestamp % _ONE_SEC)) { //heart_beat (programa em execucao)
+    digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
   }
 
-  if (timestamp == subida) {
+  if (timestamp == subida) { //ligar saida de acordo com programa
     liga_desliga = true;
     executa_programa();
     descida = timestamp + _500_MS;
@@ -224,15 +241,15 @@ SIGNAL(TIMER0_COMPA_vect)
     Serial.println();
   }
 
-  if (timestamp == descida) {
+  if (timestamp == descida) { //desligar a saida
     liga_desliga = false;
     executa_programa();
     descida = 0;
     programa_atual++;
 
-    if (programa_atual == NR_PRG) {
+    if (programa_atual == NR_PRG) {//ultimo programa executado
       parar_programa();
-    } else {
+    } else { //ainda existe programas a executar
       carrega_programa();
     }
   }
@@ -240,28 +257,28 @@ SIGNAL(TIMER0_COMPA_vect)
   timestamp++;
 }
 
-void loop() {
-  if (!digitalRead(BOTAO)) {
-    delay(100);
+void loop() { //le o botao para iniciar/parar programa
+  if (digitalRead(BOTAO)) {
+    delay(100);//debounce botao
 
-    if (!digitalRead(BOTAO)) {
-      if (ctrl) {
+    if (digitalRead(BOTAO)) { //botao pressionado
+      if (ctrl) { //trigger do botao
         ctrl = false;
 
-        if (sent) {
+        if (sent) {//inicia o programa
           sent = false;
           carrega_programa();
           OCR0A = 0xAF;
           TIMSK0 |= _BV(OCIE0A);
           Serial.println("Ligado");
-        } else {
+        } else { //para o programa
           sent = true;
           parar_programa();
           Serial.println("Desligado");
         }
       }
     }
-  } else if (!ctrl) {
-    ctrl = true;
+  } else if (!ctrl) { //botao solto
+    ctrl = true; //trigger botao
   }
 }
