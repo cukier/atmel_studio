@@ -2,7 +2,7 @@
 #define _100_MS       100
 #define _DESCIDA      200
 #define _ONE_SEC      1000
-#define VERSAO        "2"
+#define VERSAO        "3"
 
 #define PONTO_1       22
 #define PONTO_2       24
