@@ -39,20 +39,54 @@
 //#define PONTO_TESTE   A14
 #define BOTAO         A15
 
+//tempos dos disparos
+#define DISPARO_1     1324
+#define DISPARO_2     1580
+#define DISPARO_3     1850
+#define DISPARO_4     2000
+#define DISPARO_5     2500
+#define DISPARO_6     3000
+#define DISPARO_7     3500
+#define DISPARO_8     4000
+#define DISPARO_9     4500
+#define DISPARO_10    5000
+#define DISPARO_11    5500
+#define DISPARO_12    6000
+#define DISPARO_13    6500
+#define DISPARO_14    7000
+#define DISPARO_15    7500
+#define DISPARO_16    8000
+#define DISPARO_17    8500
+#define DISPARO_18    9000
+#define DISPARO_19    9500
+#define DISPARO_20    10000
+#define DISPARO_21    10500
+#define DISPARO_22    11000
+#define DISPARO_23    11500
+#define DISPARO_24    12000
+#define DISPARO_25    12500
+#define DISPARO_26    13000
+#define DISPARO_27    13500
+#define DISPARO_28    14000
+#define DISPARO_29    14500
+#define DISPARO_30    15000
+#define DISPARO_31    15500
+#define DISPARO_32    16000
+
 bool ctrl, sent, liga_desliga;
 uint8_t programa_atual;
 uint32_t timestamp, subida, descida;
 //vetor que recebe todo os 32 tempos, separado por virgula
 //o valor eh a quantidade de milisegundos a partir de
 //pressionado o botao
-uint32_t programa[NR_PRG] = { 1 * _ONE_SEC, 2 * _ONE_SEC, 3 * _ONE_SEC, 4 * _ONE_SEC,
-                              5 * _ONE_SEC, 6 * _ONE_SEC, 7 * _ONE_SEC, 8 * _ONE_SEC,
-                              9 * _ONE_SEC, 10 * _ONE_SEC, 11 * _ONE_SEC, 12 * _ONE_SEC,
-                              13 * _ONE_SEC, 14 * _ONE_SEC, 15 * _ONE_SEC, 16 * _ONE_SEC,
-                              17 * _ONE_SEC, 18 * _ONE_SEC, 19 * _ONE_SEC, 20 * _ONE_SEC,
-                              21 * _ONE_SEC, 22 * _ONE_SEC, 23 * _ONE_SEC, 24 * _ONE_SEC,
-                              25 * _ONE_SEC, 26 * _ONE_SEC, 27 * _ONE_SEC, 28 * _ONE_SEC,
-                              29 * _ONE_SEC, 30 * _ONE_SEC, 31 * _ONE_SEC, 32 * _ONE_SEC
+uint32_t programa[NR_PRG] = { DISPARO_1, DISPARO_2, DISPARO_3, DISPARO_4,
+                              DISPARO_5, DISPARO_6, DISPARO_7, DISPARO_8,
+                              DISPARO_9, DISPARO_10, DISPARO_11, DISPARO_12,
+                              DISPARO_13, DISPARO_14, DISPARO_15, DISPARO_16,
+                              DISPARO_17, DISPARO_18, DISPARO_19, DISPARO_20,
+                              DISPARO_21, DISPARO_22, DISPARO_23, DISPARO_24,
+                              DISPARO_25, DISPARO_26, DISPARO_27, DISPARO_28,
+                              DISPARO_29, DISPARO_30, DISPARO_31, DISPARO_32,
                             };
 //carrega a proxima borda de subida
 void carrega_programa() {
