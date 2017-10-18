@@ -1,6 +1,6 @@
 #define NR_PRG        32
 #define _100_MS       100
-#define _500_MS       500
+#define _DESCIDA      200
 #define _ONE_SEC      1000
 #define VERSAO        "2"
 
@@ -96,10 +96,10 @@ void carrega_programa() {
 }
 //para e reinicia o programa
 void parar_programa() {
-  timestamp = 0;
-  programa_atual = 0;
-  subida = 0;
-  descida = 0;
+  //timestamp = 0;
+  //programa_atual = 0;
+  //subida = 0;
+  //descida = 0;
   OCR0A = 0xFF;
   TIMSK0 &= ~(_BV(OCIE0A));
   digitalWrite(LED_BUILTIN, LOW);
@@ -269,7 +269,7 @@ SIGNAL(TIMER0_COMPA_vect)
   if (timestamp == subida) { //ligar saida de acordo com programa
     liga_desliga = true;
     executa_programa();
-    descida = timestamp + _500_MS;
+    descida = timestamp + _DESCIDA;
     Serial.print("Disparo ");
     Serial.print(programa_atual);
     Serial.println();
@@ -283,6 +283,10 @@ SIGNAL(TIMER0_COMPA_vect)
 
     if (programa_atual == NR_PRG) {//ultimo programa executado
       parar_programa();
+      timestamp = 0;
+      programa_atual = 0;
+      subida = 0;
+      descida = 0;
     } else { //ainda existe programas a executar
       carrega_programa();
     }
