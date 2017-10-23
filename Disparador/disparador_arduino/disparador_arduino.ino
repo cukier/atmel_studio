@@ -2,7 +2,7 @@
 #define _100_MS       100
 #define _DESCIDA      200
 #define _ONE_SEC      1000
-#define VERSAO        "3"
+#define VERSAO        "4"
 
 #define PONTO_1       22
 #define PONTO_2       24
@@ -41,7 +41,7 @@
 
 //tempos dos disparos
 #define DISPARO_1     1324
-#define DISPARO_2     1580
+#define DISPARO_2     1350
 #define DISPARO_3     1850
 #define DISPARO_4     2000
 #define DISPARO_5     2500
@@ -73,9 +73,9 @@
 #define DISPARO_31    15500
 #define DISPARO_32    16000
 
-bool ctrl, sent, liga_desliga;
-uint8_t programa_atual;
-uint32_t timestamp, subida, descida;
+bool ctrl, sent, pausar_programa, ctrl_pause;
+uint8_t programa_atual, programa_atual_des;
+uint32_t timestamp, timestamp_aux;
 //vetor que recebe todo os 32 tempos, separado por virgula
 //o valor eh a quantidade de milisegundos a partir de
 //pressionado o botao
@@ -88,24 +88,11 @@ uint32_t programa[NR_PRG] = { DISPARO_1, DISPARO_2, DISPARO_3, DISPARO_4,
                               DISPARO_25, DISPARO_26, DISPARO_27, DISPARO_28,
                               DISPARO_29, DISPARO_30, DISPARO_31, DISPARO_32,
                             };
-//carrega a proxima borda de subida
-void carrega_programa() {
-  //subida = timestamp + programa[programa_atual];
-  subida = programa[programa_atual];
-  descida = subida + 10;
-}
-//para e reinicia o programa
-void parar_programa() {
-  //timestamp = 0;
-  //programa_atual = 0;
-  //subida = 0;
-  //descida = 0;
-  OCR0A = 0xFF;
-  TIMSK0 &= ~(_BV(OCIE0A));
-  digitalWrite(LED_BUILTIN, LOW);
-}
+uint32_t programa_des[NR_PRG];
 //inicializacao mcu
 void setup() {
+  uint8_t cont;
+
   Serial.begin(9600);
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(PONTO_1, OUTPUT);
@@ -142,119 +129,119 @@ void setup() {
   pinMode(PONTO_32, OUTPUT);
   pinMode(BOTAO, INPUT);
 
-  parar_programa();
+  for (cont = 0; cont < NR_PRG; ++cont) {
+    programa_des[cont] = programa[cont] + 500;
+  }
+
   ctrl = true;
   sent = true;
+  pausar_programa = false;
+  ctrl_pause = false;
+  timestamp_aux = 0;
+  timestamp = 0;
 
   Serial.print("Inicio ");
   Serial.print(VERSAO);
   Serial.println();
 }
 //aciona ou desliga a saida do programa atual
-//var liga_desliga controla o sentido
-void executa_programa() {
-  // Serial.print("Executando programa ");
-  // Serial.print(programa_atual);
-  // Serial.print(" L/D ");
-  // Serial.print(liga_desliga);
-  // Serial.println();
-
-  switch (programa_atual) {
+void executa_programa(bool i_s, uint8_t prog) {
+  switch (prog) {
     case 0:
-      if (liga_desliga) digitalWrite(PONTO_1, HIGH); else digitalWrite(PONTO_1, LOW);
+      if (i_s) digitalWrite(PONTO_1, HIGH); else digitalWrite(PONTO_1, LOW);
       break;
     case 1:
-      if (liga_desliga) digitalWrite(PONTO_2, HIGH); else digitalWrite(PONTO_2, LOW);
+      if (i_s) digitalWrite(PONTO_2, HIGH); else digitalWrite(PONTO_2, LOW);
       break;
     case 2:
-      if (liga_desliga) digitalWrite(PONTO_3, HIGH); else digitalWrite(PONTO_3, LOW);
+      if (i_s) digitalWrite(PONTO_3, HIGH); else digitalWrite(PONTO_3, LOW);
       break;
     case 3:
-      if (liga_desliga) digitalWrite(PONTO_4, HIGH); else digitalWrite(PONTO_4, LOW);
+      if (i_s) digitalWrite(PONTO_4, HIGH); else digitalWrite(PONTO_4, LOW);
       break;
     case 4:
-      if (liga_desliga) digitalWrite(PONTO_5, HIGH); else digitalWrite(PONTO_5, LOW);
+      if (i_s) digitalWrite(PONTO_5, HIGH); else digitalWrite(PONTO_5, LOW);
       break;
     case 5:
-      if (liga_desliga) digitalWrite(PONTO_6, HIGH); else digitalWrite(PONTO_6, LOW);
+      if (i_s) digitalWrite(PONTO_6, HIGH); else digitalWrite(PONTO_6, LOW);
       break;
     case 6:
-      if (liga_desliga) digitalWrite(PONTO_7, HIGH); else digitalWrite(PONTO_7, LOW);
+      if (i_s) digitalWrite(PONTO_7, HIGH); else digitalWrite(PONTO_7, LOW);
       break;
     case 7:
-      if (liga_desliga) digitalWrite(PONTO_8, HIGH); else digitalWrite(PONTO_8, LOW);
+      if (i_s) digitalWrite(PONTO_8, HIGH); else digitalWrite(PONTO_8, LOW);
       break;
     case 8:
-      if (liga_desliga) digitalWrite(PONTO_9, HIGH); else digitalWrite(PONTO_9, LOW);
+      if (i_s) digitalWrite(PONTO_9, HIGH); else digitalWrite(PONTO_9, LOW);
       break;
     case 9:
-      if (liga_desliga) digitalWrite(PONTO_10, HIGH); else digitalWrite(PONTO_10, LOW);
+      if (i_s) digitalWrite(PONTO_10, HIGH); else digitalWrite(PONTO_10, LOW);
       break;
     case 10:
-      if (liga_desliga) digitalWrite(PONTO_11, HIGH); else digitalWrite(PONTO_11, LOW);
+      if (i_s) digitalWrite(PONTO_11, HIGH); else digitalWrite(PONTO_11, LOW);
       break;
     case 11:
-      if (liga_desliga) digitalWrite(PONTO_12, HIGH); else digitalWrite(PONTO_12, LOW);
+      if (i_s) digitalWrite(PONTO_12, HIGH); else digitalWrite(PONTO_12, LOW);
       break;
     case 12:
-      if (liga_desliga) digitalWrite(PONTO_13, HIGH); else digitalWrite(PONTO_13, LOW);
+      if (i_s) digitalWrite(PONTO_13, HIGH); else digitalWrite(PONTO_13, LOW);
       break;
     case 13:
-      if (liga_desliga) digitalWrite(PONTO_14, HIGH); else digitalWrite(PONTO_14, LOW);
+      if (i_s) digitalWrite(PONTO_14, HIGH); else digitalWrite(PONTO_14, LOW);
       break;
     case 14:
-      if (liga_desliga) digitalWrite(PONTO_15, HIGH); else digitalWrite(PONTO_15, LOW);
+      if (i_s) digitalWrite(PONTO_15, HIGH); else digitalWrite(PONTO_15, LOW);
       break;
     case 15:
-      if (liga_desliga) digitalWrite(PONTO_16, HIGH); else digitalWrite(PONTO_16, LOW);
+      if (i_s) digitalWrite(PONTO_16, HIGH); else digitalWrite(PONTO_16, LOW);
       break;
     case 16:
-      if (liga_desliga) digitalWrite(PONTO_17, HIGH); else digitalWrite(PONTO_17, LOW);
+      if (i_s) digitalWrite(PONTO_17, HIGH); else digitalWrite(PONTO_17, LOW);
       break;
     case 17:
-      if (liga_desliga) digitalWrite(PONTO_18, HIGH); else digitalWrite(PONTO_18, LOW);
+      if (i_s) digitalWrite(PONTO_18, HIGH); else digitalWrite(PONTO_18, LOW);
       break;
     case 18:
-      if (liga_desliga) digitalWrite(PONTO_19, HIGH); else digitalWrite(PONTO_19, LOW);
+      if (i_s) digitalWrite(PONTO_19, HIGH); else digitalWrite(PONTO_19, LOW);
       break;
     case 19:
-      if (liga_desliga) digitalWrite(PONTO_20, HIGH); else digitalWrite(PONTO_20, LOW);
+      if (i_s) digitalWrite(PONTO_20, HIGH); else digitalWrite(PONTO_20, LOW);
       break;
     case 20:
-      if (liga_desliga) digitalWrite(PONTO_21, HIGH); else digitalWrite(PONTO_21, LOW);
+      if (i_s) digitalWrite(PONTO_21, HIGH); else digitalWrite(PONTO_21, LOW);
       break;
     case 21:
-      if (liga_desliga) digitalWrite(PONTO_22, HIGH); else digitalWrite(PONTO_22, LOW);
+      if (i_s) digitalWrite(PONTO_22, HIGH); else digitalWrite(PONTO_22, LOW);
       break;
     case 22:
-      if (liga_desliga) digitalWrite(PONTO_23, HIGH); else digitalWrite(PONTO_23, LOW);
+      if (i_s) digitalWrite(PONTO_23, HIGH); else digitalWrite(PONTO_23, LOW);
       break;
     case 23:
-      if (liga_desliga) digitalWrite(PONTO_24, HIGH); else digitalWrite(PONTO_24, LOW);
+      if (i_s) digitalWrite(PONTO_24, HIGH); else digitalWrite(PONTO_24, LOW);
       break;
     case 24:
-      if (liga_desliga) digitalWrite(PONTO_25, HIGH); else digitalWrite(PONTO_25, LOW);
+      if (i_s) digitalWrite(PONTO_25, HIGH); else digitalWrite(PONTO_25, LOW);
       break;
     case 25:
-      if (liga_desliga) digitalWrite(PONTO_26, HIGH); else digitalWrite(PONTO_26, LOW);
+      if (i_s) digitalWrite(PONTO_26, HIGH); else digitalWrite(PONTO_26, LOW);
       break;
     case 26:
-      if (liga_desliga) digitalWrite(PONTO_27, HIGH); else digitalWrite(PONTO_27, LOW);
+      if (i_s) digitalWrite(PONTO_27, HIGH); else digitalWrite(PONTO_27, LOW);
       break;
     case 27:
-      if (liga_desliga) digitalWrite(PONTO_28, HIGH); else digitalWrite(PONTO_28, LOW);
+      if (i_s) digitalWrite(PONTO_28, HIGH); else digitalWrite(PONTO_28, LOW);
       break;
     case 28:
-      if (liga_desliga) digitalWrite(PONTO_29, HIGH); else digitalWrite(PONTO_29, LOW);
+      if (i_s) digitalWrite(PONTO_29, HIGH); else digitalWrite(PONTO_29, LOW);
       break;
     case 29:
-      if (liga_desliga) digitalWrite(PONTO_30, HIGH); else digitalWrite(PONTO_30, LOW);
+      if (i_s) digitalWrite(PONTO_30, HIGH); else digitalWrite(PONTO_30, LOW);
       break;
     case 30:
-      if (liga_desliga) digitalWrite(PONTO_31, HIGH); else digitalWrite(PONTO_31, LOW);
+      if (i_s) digitalWrite(PONTO_31, HIGH); else digitalWrite(PONTO_31, LOW);
       break;
     case 31:
-      if (liga_desliga) digitalWrite(PONTO_32, HIGH); else digitalWrite(PONTO_32, LOW);
+      if (i_s) digitalWrite(PONTO_32, HIGH); else digitalWrite(PONTO_32, LOW);
       break;
   }
 }
@@ -266,30 +253,38 @@ SIGNAL(TIMER0_COMPA_vect)
     digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
   }
 
-  if (timestamp == subida) { //ligar saida de acordo com programa
-    liga_desliga = true;
-    executa_programa();
-    descida = timestamp + _DESCIDA;
-    Serial.print("Disparo ");
-    Serial.print(programa_atual);
-    Serial.println();
+  if (timestamp == programa[programa_atual]) { //ligar saida de acordo com programa
+    if (pausar_programa) {
+      if (ctrl_pause) {
+        ctrl_pause = false;
+        timestamp_aux = timestamp;
+      }
+    } else {
+      executa_programa(true, programa_atual);
+      Serial.print("Disparo ");
+      Serial.print(programa_atual);
+      Serial.println();
+      programa_atual++;
+    }
   }
 
-  if (timestamp == descida) { //desligar a saida
-    liga_desliga = false;
-    executa_programa();
-    descida = 0;
-    programa_atual++;
+  if (timestamp == programa_des[programa_atual_des]) { //desligar a saida
+    executa_programa(false, programa_atual_des);
+    programa_atual_des++;
 
-    if (programa_atual == NR_PRG) {//ultimo programa executado
-      parar_programa();
+    if (programa_atual_des == NR_PRG) {//ultimo programa executado
+      OCR0A = 0xFF;
+      TIMSK0 &= ~(_BV(OCIE0A));
       timestamp = 0;
       programa_atual = 0;
-      subida = 0;
-      descida = 0;
-    } else { //ainda existe programas a executar
-      carrega_programa();
     }
+  }
+
+  if (pausar_programa && (programa_atual_des == programa_atual)) {
+    pausar_programa = false;
+    OCR0A = 0xFF;
+    TIMSK0 &= ~(_BV(OCIE0A));
+    digitalWrite(LED_BUILTIN, LOW);
   }
 
   timestamp++;
@@ -305,14 +300,15 @@ void loop() { //le o botao para iniciar/parar programa
 
         if (sent) {//inicia o programa
           sent = false;
-          carrega_programa();
+          timestamp = timestamp_aux;
           OCR0A = 0xAF;
           TIMSK0 |= _BV(OCIE0A);
           Serial.println("Ligado");
         } else { //para o programa
           sent = true;
-          parar_programa();
-          Serial.println("Desligado");
+          pausar_programa = true;
+          ctrl_pause = true;
+          Serial.println("Parado");
         }
       }
     }
