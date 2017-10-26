@@ -72,3 +72,5 @@ $RECYCLE.BIN/
 *.pdsbak
 *.workspace
 *.SDF
+
+*.kicad_pcb-bak
