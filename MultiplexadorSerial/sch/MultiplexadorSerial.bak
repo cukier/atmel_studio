@@ -36,14 +36,14 @@ EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
 Sheet 1 1
-Title ""
-Date ""
-Rev ""
-Comp ""
+Title "Multiplexador serial rs485"
+Date "2017-10-27"
+Rev "0"
+Comp "Krebsfer Industrial LTDA."
 Comment1 ""
-Comment2 ""
-Comment3 ""
-Comment4 ""
+Comment2 "mauricio@krebs.com.br"
+Comment3 "Engenheiro Eletrico"
+Comment4 "Mauricio Cukier"
 $EndDescr
 $Comp
 L ARDUINO_SHIELD SHIELD1
@@ -51,7 +51,7 @@ U 1 1 59F1D7C7
 P 8750 1600
 F 0 "SHIELD1" H 8400 2550 60  0000 C CNN
 F 1 "ARDUINO_SHIELD" H 8800 650 60  0000 C CNN
-F 2 "arduino_shields:ARDUINO SHIELD" H 8750 1600 60  0001 C CNN
+F 2 "w_conn_misc:arduino_header" H 8750 1600 60  0001 C CNN
 F 3 "" H 8750 1600 60  0001 C CNN
 	1    8750 1600
 	1    0    0    -1  
