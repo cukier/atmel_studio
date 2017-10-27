@@ -2,7 +2,7 @@
 #define _100_MS       100
 #define _DESCIDA      200
 #define _ONE_SEC      1000
-#define VERSAO        "4"
+#define VERSAO        "4.1"
 
 #define PONTO_1       22
 #define PONTO_2       24
@@ -40,9 +40,9 @@
 #define BOTAO         A15
 
 //tempos dos disparos
-#define DISPARO_1     1324
-#define DISPARO_2     1350
-#define DISPARO_3     1850
+#define DISPARO_1     500
+#define DISPARO_2     1000
+#define DISPARO_3     1500
 #define DISPARO_4     2000
 #define DISPARO_5     2500
 #define DISPARO_6     3000
@@ -288,6 +288,7 @@ SIGNAL(TIMER0_COMPA_vect)
   }
 
   timestamp++;
+  TCNT0 = 0;
 }
 
 void loop() { //le o botao para iniciar/parar programa
@@ -301,7 +302,7 @@ void loop() { //le o botao para iniciar/parar programa
         if (sent) {//inicia o programa
           sent = false;
           timestamp = timestamp_aux;
-          OCR0A = 0xAF;
+          OCR0A = 0xEE;
           TIMSK0 |= _BV(OCIE0A);
           Serial.println("Ligado");
         } else { //para o programa

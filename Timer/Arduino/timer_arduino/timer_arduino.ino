@@ -9,11 +9,10 @@ void setup() {
 }
 
 SIGNAL(TIMER0_COMPA_vect) {  
-  TCNT0 = 0;
-  //OCR0A = 0xAF;
-  //timestamp++;
+  TCNT0 = 0;  
+  timestamp++;
 
-  //if (timestamp == 60000)
+  if (timestamp == 60000)
     PORTC ^= (1 << PC0);
 }
 
