@@ -1,4 +1,4 @@
-update=26/10/2017 11:06:35
+update=27/10/2017 08:07:24
 version=1
 last_client=kicad
 [pcbnew]
@@ -23,8 +23,6 @@ ModuleOutlineThickness=0.150000000000
 [cvpcb]
 version=1
 NetIExt=net
-[general]
-version=1
 [eeschema]
 version=1
 LibDir=
@@ -60,3 +58,15 @@ LibName28=contrib
 LibName29=valves
 LibName30=D:/Projetos/atmel_studio/MultiplexadorSerial/lib/Arduino_Shield_Modules_for_KiCad_V3/arduino_shieldsNCL
 LibName31=D:/Projetos/atmel_studio/MultiplexadorSerial/lib/m_led
+[schematic_editor]
+version=1
+PageLayoutDescrFile=
+PlotDirectoryName=pdf
+SubpartIdSeparator=0
+SubpartFirstId=65
+NetFmtName=Pcbnew
+SpiceForceRefPrefix=0
+SpiceUseNetNumbers=0
+LabSize=60
+[general]
+version=1
