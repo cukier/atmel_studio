@@ -30,12 +30,15 @@ int main(void)
 {
 	uint8_t cont = 0;
 	
+	DDRC |= _BV(DDC0);
 	uart_init(UART_BAUD_SELECT(UART_BAUD_RATE, F_CPU));
 	sei();
 	_delay_ms(200);
 	
 	while(1)
 	{
+		PORTC ^= _BV(PORTC0);
+		_delay_ms(10);
 		uart_putc(cont++);
 		_delay_ms(500);
 	}
