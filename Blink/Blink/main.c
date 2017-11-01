@@ -12,11 +12,11 @@
 
 int main(void)
 {
-	DDRB |= _BV(DDB5);
+	DDRB |= _BV(DDB1);
     
     while (1) 
     {
-		PORTB ^= _BV(PORTB5);
+		PORTB ^= _BV(PORTB1);
 		_delay_ms(500);
     }
 	
