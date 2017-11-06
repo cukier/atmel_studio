@@ -2,7 +2,7 @@
 #define _100_MS       100
 #define _DESCIDA      200
 #define _ONE_SEC      1000
-#define VERSAO        "4.1"
+#define VERSAO        "4.2"
 
 #define PONTO_1       22
 #define PONTO_2       24
@@ -127,6 +127,7 @@ void setup() {
   pinMode(PONTO_30, OUTPUT);
   pinMode(PONTO_31, OUTPUT);
   pinMode(PONTO_32, OUTPUT);
+  //pinMode(PONTO_TESTE, OUTPUT);
   pinMode(BOTAO, INPUT);
 
   for (cont = 0; cont < NR_PRG; ++cont) {
@@ -289,11 +290,12 @@ SIGNAL(TIMER0_COMPA_vect)
 
   timestamp++;
   TCNT0 = 0;
+  //digitalWrite(PONTO_TESTE, !digitalRead(PONTO_TESTE));
 }
 
 void loop() { //le o botao para iniciar/parar programa
   if (digitalRead(BOTAO)) {
-    delay(100);//debounce botao
+    delay(10);//debounce botao
 
     if (digitalRead(BOTAO)) { //botao pressionado
       if (ctrl) { //trigger do botao
