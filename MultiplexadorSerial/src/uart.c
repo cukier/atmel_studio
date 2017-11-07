@@ -563,7 +563,8 @@ void uart0_init(uint16_t baudrate)
 	#ifdef URSEL0
 	UCSR0C = (1<<URSEL0)|(3<<UCSZ00);
 	#else
-	UCSR0C = (3<<UCSZ00)|(1<<UPM01);
+	//UCSR0C = (3<<UCSZ00)|(1<<UPM01);
+	UCSR0C = (3<<UCSZ00);
 	#endif
 
 	#elif defined (ATMEGA_UART)

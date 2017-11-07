@@ -8,6 +8,10 @@
 #ifndef SRC_SYS_H_
 #define SRC_SYS_H_
 
+#if !(_SLOW_XTAL) && ! (_FAST_XTAL)
+#error Definir cristal "_SLOW_XTAL" ou "_FAST_XTAL"
+#endif
+
 #define	PORT(x)							_port2(x)
 #define	DDR(x)							_ddr2(x)
 #define	PIN(x)							_pin2(x)
@@ -42,14 +46,21 @@
 #define	IS_SET2(x,y)					((PIN(x) & (1<<y)) != 0)
 
 #define make32(hh, hl, lh, ll)			(((uint32_t) hh << 24) & 0xFF000000) | \
-										(((uint32_t) hl << 16) & 0xFF0000) | \
-										(((uint32_t) lh << 8) & 0xFF00) | \
-										(((uint32_t) ll) & 0xFF)
+(((uint32_t) hl << 16) & 0xFF0000) | \
+(((uint32_t) lh << 8) & 0xFF00) | \
+(((uint32_t) ll) & 0xFF)
 #define make16(h, l)					((uint16_t) (h & 0xff) * 0x100 + (l & 0xff))
 #define make8(v, o)						((uint8_t) (((v >> (o * 8)) & 0xff)))
 #define swap(v)							((v << 8) | (v >> 8))
 
+#ifdef _SLOW_XTAL
 #define F_CPU							4000000ULL
+#endif
+
+#ifdef _FAST_XTAL
+#define F_CPU							16000000ULL
+#endif
+
 #define BAUD							9600
 
 #ifdef __DEBUG
