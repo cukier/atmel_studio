@@ -67,13 +67,12 @@ void terminal_printf(enum Terminais terminal, const char str[], ...)
 
 void m_init(void)
 {
-	#ifdef _SLOW_XTAL
+	#ifdef _LOW_SPEED_BAUD
 	uart_init(UART_BAUD_SELECT(BAUD, F_CPU));
 	#endif
 	
-	#ifdef _FAST_XTAL
-	//uart_init(UART_BAUD_SELECT_DOUBLE_SPEED(BAUD, F_CPU));
-	uart_init(UART_BAUD_SELECT(BAUD, F_CPU));
+	#ifdef _HIGH_SPEED_BAUD
+	uart_init(UART_BAUD_SELECT_DOUBLE_SPEED(BAUD, F_CPU));
 	#endif
 	
 	SET_OUTPUT(ADR_T1);
@@ -158,8 +157,57 @@ void fun3(void)
 				}
 				
 				uart_printf("\n\r");
+			}
+		}
+	}
+}
+
+bool get_from_slave(uint8_t *data, uint16_t len)
+{
+	uint16_t i, tries = 10, n = 0;
+	
+	set_terminal(TERMINAL_3);
+	
+	for (i = 0; i < len; ++i)
+	{
+		uart_putc(data[i]);
+	}
+	
+	do
+	{
+		n = uart_available();
+		_delay_ms(100);
+	} while ((n != uart_available()) && (--tries));
+	
+	_delay_ms(100);
+	
+	return (((n != 0)) & ((tries != 0)));
+}
+
+void fun4(void)
+{
+	enum Terminais terminal;
+	uint8_t m_buffer[256] = { 0  };
+	uint16_t buffer_size;
+	
+	terminal = TERMINAL_1;
+	m_init();
+	
+	while(1)
+	{
+		for (terminal = TERMINAL_1; terminal <= TERMINAL_2; ++terminal)
+		{
+			set_terminal(terminal);
+			//_delay_ms(1000);
+			
+			if (listenin())
+			{
+				_delay_ms(100);
+				buffer_size = uart_available();
+				uart_printf("Recebido %u no terminal %u\n\r", buffer_size, terminal);
+				uart_get(m_buffer, buffer_size);
 				uart_flush();
-				_delay_ms(300);
+				get_from_slave(m_buffer, buffer_size);
 			}
 			
 			TOGGLE(LED);
@@ -167,8 +215,14 @@ void fun3(void)
 	}
 }
 
+void fun5(void)
+{
+	set_terminal(TERMINAL_3);	
+	
+}
+
 int main(void)
 {
-	fun3();
+	fun5();
 	return 0;
 }

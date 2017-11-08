@@ -48,15 +48,17 @@
 #define make16(h, l)					((uint16_t) (h & 0xff) * 0x100 + (l & 0xff))
 #define make8(v, o)						((uint8_t) (((v >> (o * 8)) & 0xff)))
 
-#define F_CPU							4000000ULL
+#define F_CPU							8000000ULL
 #define BAUD							9600
 
 #ifdef USART1_ENABLED
 #define BAUD_2							9600
 #endif
 
-#ifdef DEBUG
+#ifdef _DEBUG
 #define SERIAL_ADR						C,0
 #endif
+
+#define LED								C,5
 
 #endif /* SRC_SYS_H_ */

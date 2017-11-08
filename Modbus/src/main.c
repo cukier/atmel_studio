@@ -17,7 +17,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#ifdef DEBUG
+#ifdef _DEBUG
 void debug_msg(const char *str, ...)
 {
 	va_list args;
@@ -40,16 +40,18 @@ void debug_msg(const char *str, ...)
 void init(void)
 {
 	
-	#ifdef DEBUG
+	#ifdef _DEBUG
 	SET_OUTPUT(SERIAL_ADR);
 	#endif
+	SET_OUTPUT(LED);
 	
 	modbus_init(1);
 	sei();
 	_delay_ms(300);
-	#ifdef DEBUG
+	#ifdef _DEBUG
 	debug_msg("Inicio\n\r");
 	#endif
+	SET(LED);
 	
 	return;
 }
@@ -60,11 +62,17 @@ int main(void)
 	
 	while (1)
 	{
-		#ifdef DEBUG
+		#ifdef _DEBUG
 		RESET(SERIAL_ADR);
 		_delay_ms(1);
 		#endif
-		modbus_slave();
+		
+		if (modbus_slave())
+		{
+			RESET(LED);
+			_delay_ms(5);
+			SET(LED);
+		}
 	}
 	
 	return 0;

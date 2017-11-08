@@ -9,7 +9,11 @@
 #define SRC_SYS_H_
 
 #if !(_SLOW_XTAL) && ! (_FAST_XTAL)
-#error Definir cristal "_SLOW_XTAL" ou "_FAST_XTAL"
+#error "Definir cristal "_SLOW_XTAL" ou "_FAST_XTAL""
+#endif
+
+#if !(_HIGH_SPEED_BAUD) && ! (_LOW_SPEED_BAUD)
+#error "Definir baud "_HIGH_SPEED_BAUD" (115200) ou "_LOW_SPEED_BAUD" (9600)"
 #endif
 
 #define	PORT(x)							_port2(x)
@@ -45,7 +49,8 @@
 
 #define	IS_SET2(x,y)					((PIN(x) & (1<<y)) != 0)
 
-#define make32(hh, hl, lh, ll)			(((uint32_t) hh << 24) & 0xFF000000) | \
+#define make32(hh, hl, lh, ll)\
+(((uint32_t) hh << 24) & 0xFF000000) | \
 (((uint32_t) hl << 16) & 0xFF0000) | \
 (((uint32_t) lh << 8) & 0xFF00) | \
 (((uint32_t) ll) & 0xFF)
@@ -61,7 +66,13 @@
 #define F_CPU							16000000ULL
 #endif
 
+#ifdef _HIGH_SPEED_BAUD
+#define BAUD							57600
+#endif
+
+#ifdef _LOW_SPEED_BAUD
 #define BAUD							9600
+#endif
 
 #ifdef __DEBUG
 void debug_msg(const char *str, ...);
