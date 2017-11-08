@@ -167,17 +167,19 @@ bool get_from_slave(uint8_t *data, uint16_t len)
 	uint16_t i, tries = 10, n = 0;
 	
 	set_terminal(TERMINAL_3);
+	uart_flush();
 	
 	for (i = 0; i < len; ++i)
 	{
 		uart_putc(data[i]);
 	}
 	
+	while(uart_done());
+	
 	do
 	{
-		n = uart_available();
 		_delay_ms(100);
-	} while ((n != uart_available()) && (--tries));
+	} while ((uart_available() == 0) && (--tries));
 	
 	_delay_ms(100);
 	
@@ -217,8 +219,36 @@ void fun4(void)
 
 void fun5(void)
 {
-	set_terminal(TERMINAL_3);	
+	uint16_t n = 0, cont;
+	uint8_t resp[128] = {0};
+	uint8_t req[8] = {0x01, 0x03, 0x00, 0x00, 0x00, 0x0A, 0xC5, 0xCD};
 	
+	m_init();
+	
+	while (1)
+	{
+		uart_flush();
+		set_terminal(TERMINAL_3);
+		uart_send(req, 8);
+		_delay_ms(500);
+		n = uart_available();
+		
+		if (n != 0)
+		{
+			uart_get(resp, n);
+		}
+		
+		set_terminal(TERMINAL_1);
+		uart_printf("\nRecebido %u\n", n);
+		
+		for (cont = 0; cont < n; ++cont)
+		{
+			uart_printf("%u ", resp[cont]);
+		}
+		
+		TOGGLE(LED);
+		_delay_ms(500);
+	}
 }
 
 int main(void)
