@@ -5,41 +5,24 @@
 #include <avr/interrupt.h>
 #include <util/delay.h>
 
-void f1(void)
-{
-	uint16_t n;
-	
-	do
-	{
-		n = uart_available();
-		_delay_ms(10);
-	} while (uart_available() != n);
-	
-	while(n--)
-	{
-		uart_putc(uart_getc());
-		
-		if (n == 0)
-		{
-			uart_flush();
-		}
-	}
-}
+#define ADR_T1			C,0
+#define ADR_T2			C,1
+#define LED				C,5
 
 int main(void)
 {
-	uint8_t cont = 0;
-	
-	DDRC |= _BV(DDC0);
-	uart_init(UART_BAUD_SELECT(UART_BAUD_RATE, F_CPU));
+	uart_init();
+	SET_OUTPUT(ADR_T1);
+	SET_OUTPUT(ADR_T2);
+	SET_OUTPUT(LED);
+	RESET(ADR_T1);
+	RESET(ADR_T2);
 	sei();
-	_delay_ms(200);
 	
 	while(1)
 	{
-		PORTC ^= _BV(PORTC0);
-		_delay_ms(10);
-		uart_putc(cont++);
+		TOGGLE(LED);
+		uart_printf("Hello\n\r");
 		_delay_ms(500);
 	}
 	
