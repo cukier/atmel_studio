@@ -241,8 +241,8 @@ void fun5(void)
 	
 	while (1)
 	{
-		uart_flush();
 		set_terminal(TERMINAL_3);
+		uart_flush();
 		uart_send(req, 8);
 		_delay_ms(500);
 		n = uart_available();
@@ -300,6 +300,6 @@ void fun6(void)
 
 int main(void)
 {
-	fun4();
+	fun5();
 	return 0;
 }
