@@ -775,6 +775,7 @@ Returns:  None
 void uart0_flush(void)
 {
 	ATOMIC_BLOCK(ATOMIC_FORCEON) {
+		//UART_RxHead = UART_RxTail;
 		UART_RxHead = UART_RxTail = 0;
 		UART_TxHead = UART_TxTail = 0;
 	}

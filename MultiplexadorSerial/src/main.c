@@ -24,6 +24,7 @@ void set_terminal(enum Terminais t)
 {
 	switch(t)
 	{
+		default:
 		case TERMINAL_1:
 		RESET(ADR_T1);
 		RESET(ADR_T2);
@@ -46,6 +47,7 @@ void set_terminal(enum Terminais t)
 	}
 	
 	_delay_ms(10);
+	uart_flush();
 }
 
 void terminal_printf(enum Terminais terminal, const char str[], ...)
@@ -130,8 +132,8 @@ uint16_t listenin(void)
 void fun3(void)
 {
 	enum Terminais terminal;
-	uint16_t n, i;
-	//char c;
+	uint16_t n;
+	uint8_t m_buffer[256] = {0};
 	
 	terminal = TERMINAL_1;
 	m_init();
@@ -140,26 +142,32 @@ void fun3(void)
 	{
 		for (terminal = TERMINAL_1; terminal <= TERMINAL_4; ++terminal)
 		{
+			TOGGLE(LED);
 			set_terminal(terminal);
-			//_delay_ms(1000);
 			
 			if (listenin())
 			{
 				_delay_ms(100);
 				n = uart_available();
-				uart_printf("Recebido %u no terminal %u\n\r", n, terminal);
 				
-				for (i = 0; i < n; ++i)
+				if (n == 8)
 				{
-					//c = uart_getc();
-					//uart_printf("%d %c ", c, c);
-					uart_printf("%d ", uart_getc());
+					uart_get(m_buffer, n);
+					set_terminal(TERMINAL_3);
+					uart_send(m_buffer, n);
+					_delay_ms(500);
+					n = uart_available();
+					set_terminal(terminal);
+					uart_printf("Recebido %u no terminal %u\n\r", n, terminal);
+					
+					while (!uart_done())
+					{
+						_delay_ms(10);
+					}
 				}
-				
-				uart_printf("\n\r");
-			}
-		}
-	}
+			} //if (listenin())
+		} //for terminal
+	} //while(1)
 }
 
 bool get_from_slave(uint8_t *data, uint16_t len)
@@ -189,15 +197,15 @@ bool get_from_slave(uint8_t *data, uint16_t len)
 void fun4(void)
 {
 	enum Terminais terminal;
-	uint8_t m_buffer[256] = { 0  };
-	uint16_t buffer_size;
+	uint8_t m_buffer[256] = {0};
+	uint16_t n, cont;
 	
 	terminal = TERMINAL_1;
 	m_init();
 	
 	while(1)
 	{
-		for (terminal = TERMINAL_1; terminal <= TERMINAL_2; ++terminal)
+		for (terminal = TERMINAL_1; terminal <= TERMINAL_4; ++terminal)
 		{
 			set_terminal(terminal);
 			//_delay_ms(1000);
@@ -205,11 +213,17 @@ void fun4(void)
 			if (listenin())
 			{
 				_delay_ms(100);
-				buffer_size = uart_available();
-				uart_printf("Recebido %u no terminal %u\n\r", buffer_size, terminal);
-				uart_get(m_buffer, buffer_size);
-				uart_flush();
-				get_from_slave(m_buffer, buffer_size);
+				n = uart_available();
+				uart_printf("\n\rRecebido %u no terminal %u\n\r", n, terminal);
+				uart_get(m_buffer, n);
+				
+				for (cont = 0; cont < n; ++cont)
+				{
+					uart_printf("%u ", m_buffer[cont]);
+				}
+				
+				uart_printf("\n\r");
+				while(!uart_done());
 			}
 			
 			TOGGLE(LED);
@@ -251,8 +265,41 @@ void fun5(void)
 	}
 }
 
+void fun6(void)
+{
+	enum Terminais terminal = TERMINAL_1;
+	uint16_t tries, n;
+	
+	m_init();
+	
+	while(1)
+	{
+		set_terminal(terminal);
+		uart_printf("Terminal %u\n\r", terminal);
+		while(!uart_done());
+		tries = 500;
+		n = 0;
+		
+		do
+		{
+			n = uart_available();
+			_delay_ms(10);
+		} while (--tries);
+		
+		uart_printf("Terminal %u %u bytes\n\r", terminal, n);
+		while(!uart_done());
+		++terminal;
+		
+		if (terminal > TERMINAL_3)
+		{
+			terminal = TERMINAL_1;
+		}
+	}
+	
+}
+
 int main(void)
 {
-	fun5();
+	fun4();
 	return 0;
 }
