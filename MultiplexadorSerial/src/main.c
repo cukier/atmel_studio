@@ -8,6 +8,7 @@
 #include <avr/interrupt.h>
 
 #define BUFFER_SIZE		32
+#define LEITURAS		1000
 #define ADR_T1			C,0
 #define ADR_T2			C,1
 #define LED				C,5
@@ -233,19 +234,31 @@ void fun4(void)
 
 void fun5(void)
 {
-	uint16_t n = 0, cont;
+	uint16_t n = 0, cont, tries;
 	uint8_t resp[128] = {0};
 	uint8_t req[8] = {0x01, 0x03, 0x00, 0x00, 0x00, 0x0A, 0xC5, 0xCD};
+	bool ctrl;
 	
 	m_init();
 	
 	while (1)
 	{
 		set_terminal(TERMINAL_3);
-		uart_flush();
+		tries = LEITURAS;
+		n = 0;
 		uart_send(req, 8);
-		_delay_ms(500);
-		n = uart_available();
+		ctrl = false;
+		
+		do
+		{
+			n = uart_available();
+			ctrl = (n != 25);
+			
+			if (ctrl)
+			{
+				_delay_ms(1);
+			}
+		} while ((ctrl) && (--tries));
 		
 		if (n != 0)
 		{
@@ -253,7 +266,7 @@ void fun5(void)
 		}
 		
 		set_terminal(TERMINAL_1);
-		uart_printf("\nRecebido %u\n", n);
+		uart_printf("\nRecebido %u tentativas %u\n", n, (LEITURAS - tries));
 		
 		for (cont = 0; cont < n; ++cont)
 		{
@@ -261,7 +274,7 @@ void fun5(void)
 		}
 		
 		TOGGLE(LED);
-		_delay_ms(500);
+		while(!uart_done());
 	}
 }
 
