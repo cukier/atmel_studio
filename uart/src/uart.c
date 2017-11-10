@@ -85,8 +85,21 @@ void uart_flush(void)
 {
 	ATOMIC_BLOCK(ATOMIC_FORCEON)
 	{
-		UART_RxHead = UART_RxTail;
+		//UART_RxHead = UART_RxTail;
+		UART_RxHead = UART_RxTail = 0;
+		UART_TxHead = UART_TxTail = 0;
 	}
+}
+
+bool uart_done(void)
+{
+	bool ret = false;
+
+	ATOMIC_BLOCK(ATOMIC_FORCEON) {
+		ret = (UART_TxHead == UART_TxTail);
+	}
+	
+	return ret;
 }
 
 uint8_t uart_getc(void)

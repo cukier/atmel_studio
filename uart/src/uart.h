@@ -4,6 +4,7 @@
 #include "sys.h"
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #ifndef BAUD
 #error "Definir BAUD"
@@ -23,9 +24,11 @@
 extern void uart_init(uint16_t baudrate);
 extern uint16_t uart_available(void);
 extern void uart_flush(void);
+extern bool uart_done(void);
 extern void uart_get(uint8_t *data, uint16_t len);
 extern void uart_putc(uint8_t data);
 extern void uart_send(uint8_t *data, uint16_t len);
+extern void uart_puts(const char *s);
 extern void uart_printf(char *format, ...);
 
 #endif
