@@ -11,7 +11,7 @@
 
 int main(void)
 {
-	uart_init();
+	uart_init(UART_BAUD_SELECT(BAUD, F_CPU));
 	SET_OUTPUT(ADR_T1);
 	SET_OUTPUT(ADR_T2);
 	SET_OUTPUT(LED);
@@ -24,6 +24,13 @@ int main(void)
 		TOGGLE(LED);
 		uart_printf("Hello\n\r");
 		_delay_ms(500);
+		
+		if (uart_available())
+		{
+			_delay_ms(100);
+			uart_printf("Recebido %u\n\r", uart_available());
+			uart_flush();
+		}
 	}
 	
 	return 0;

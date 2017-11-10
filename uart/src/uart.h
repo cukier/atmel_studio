@@ -17,7 +17,10 @@
 #define UART_TX0_BUFFER_SIZE 128
 #endif
 
-extern void uart_init(void);
+#define UART_BAUD_SELECT(baudRate,xtalCpu) (((xtalCpu)+8UL*(baudRate))/(16UL*(baudRate))-1UL)
+#define UART_BAUD_SELECT_DOUBLE_SPEED(baudRate,xtalCpu) ((((xtalCpu)+4UL*(baudRate))/(8UL*(baudRate))-1)|0x8000)
+
+extern void uart_init(uint16_t baudrate);
 extern uint16_t uart_available(void);
 extern void uart_flush(void);
 extern void uart_get(uint8_t *data, uint16_t len);

@@ -45,7 +45,7 @@ ISR(USART_RX_vect)
 	}
 }
 
-void uart_init(void)
+void uart_init(uint16_t baudrate)
 {
 	ATOMIC_BLOCK(ATOMIC_FORCEON)
 	{
@@ -55,9 +55,16 @@ void uart_init(void)
 		UART_RxTail = 0;
 	}
 	
-	UBRR0H = (uint8_t)(BAUD>>8);
-	UBRR0L = (uint8_t) BAUD;
+	if (baudrate & 0x8000)
+	{
+		UCSR0A = (1<<U2X0);
+		baudrate &= ~0x8000;
+	}
 	
+	UBRR0H = (uint8_t)(baudrate>>8);
+	UBRR0L = (uint8_t) baudrate;
+	
+	UCSR0B = (1<<RXEN0)|(1<<TXEN0)|(1<<RXCIE0);
 	//UCSR0C = (1<<URSEL0)|(3<<UCSZ00);
 	UCSR0C = (3<<UCSZ00);
 }
