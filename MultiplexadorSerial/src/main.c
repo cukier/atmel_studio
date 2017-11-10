@@ -6,6 +6,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <avr/interrupt.h>
+#include <stdbool.h>
 
 #define BUFFER_SIZE		32
 #define LEITURAS		1000
@@ -60,7 +61,7 @@ void terminal_printf(enum Terminais terminal, const char str[], ...)
 	va_start(args, str);
 	vsnprintf(buffer, BUFFER_SIZE, str, args);
 	va_end(args);
-	uart0_puts(buffer);
+	uart_puts(buffer);
 	
 	while(!uart_done());
 	_delay_ms(5);
@@ -311,8 +312,33 @@ void fun6(void)
 	
 }
 
+void fun7(void)
+{
+	uint8_t req[8] = {0x01, 0x03, 0x00, 0x00, 0x00, 0x0A, 0xC5, 0xCD};
+	uint16_t n;
+	
+	m_init();
+	
+	while(true)
+	{
+		set_terminal(TERMINAL_3);
+		uart_send(req, 8);
+		while (!uart_done());
+		_delay_ms(500);
+		n = uart_available();
+		
+		if (n != 0)
+		{
+			set_terminal(TERMINAL_1);
+			uart_printf("Recebido %u\n\r", n);
+			while (!uart_done());
+			_delay_ms(500);
+		}
+	}
+}
+
 int main(void)
 {
-	fun5();
+	fun7();
 	return 0;
 }
