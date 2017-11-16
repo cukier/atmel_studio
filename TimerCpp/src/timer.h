@@ -11,11 +11,11 @@ enum Timer0_Clock
 
 class Timer
 {
-	uint8_t mode;
+	enum Timer0_Clock mode;
 	
 	public:
 	
-	static void init(void);
+	void init(void);
 	void start(void);
 	void stop(void);
 	uint16_t get_timer(void);

@@ -18,11 +18,12 @@ void Timer::init()
 	DDRB |= (1 << DDB5);
 	TIMSK0 |= (1 << TOIE0);
 	TCNT0 = 0;
+	mode = TIMER0_DIV_1;
 }
 
 void Timer::start()
 {
-	set_mode((Timer0_Clock) this->mode);
+	set_mode(Timer::mode);
 }
 
 void Timer::stop()

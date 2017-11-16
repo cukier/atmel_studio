@@ -5,7 +5,7 @@
 
 int main(void)
 {
-	Timer t;
+	Timer t, t1;
 	
 	t.init();
 	t.set_mode(TIMER0_DIV_256);
@@ -14,9 +14,9 @@ int main(void)
 	
 	while(1)
 	{
-		if (t.get_timer() == 15)
+		if (t1.get_timer() == 12)
 		{
-			t.stop();
+			t1.stop();
 		}
 	}
 	
