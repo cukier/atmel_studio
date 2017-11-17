@@ -11,11 +11,11 @@
 #endif
 
 #ifndef UART_RX0_BUFFER_SIZE
-#define UART_RX0_BUFFER_SIZE 128
+#define UART_RX0_BUFFER_SIZE 256
 #endif
 
 #ifndef UART_TX0_BUFFER_SIZE
-#define UART_TX0_BUFFER_SIZE 128
+#define UART_TX0_BUFFER_SIZE 256
 #endif
 
 #define UART_BAUD_SELECT(baudRate,xtalCpu) (((xtalCpu)+8UL*(baudRate))/(16UL*(baudRate))-1UL)

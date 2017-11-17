@@ -343,7 +343,7 @@ uint16_t receive(void)
 {
 	uint16_t tries, n;
 	
-	tries = 50;
+	tries = 10;
 	n = 0;
 	
 	do
@@ -351,13 +351,35 @@ uint16_t receive(void)
 		n = uart_available();
 		_delay_ms(10);
 		
-		if (!n && tries == 5)
-		{
-			tries = 1;
-		}
+		//if (!n && tries == 45)
+		//{
+		//tries = 1;
+		//}
 	} while (--tries);
 	
 	return n;
+}
+
+uint16_t send_to_slave(uint8_t *buff, uint16_t n)
+{
+	_delay_ms(100);
+	n = uart_available();
+	uart_get(buff, n);
+	set_terminal(TERMINAL_3);
+	uart_send(buff, n);
+	while(!uart_done());
+	
+	return receive();
+}
+
+void send_back_to_terminal(uint8_t *buff, uint16_t n, enum Terminais terminal)
+{
+	_delay_ms(100);
+	n = uart_available();
+	uart_get(buff, n);
+	set_terminal(terminal);
+	uart_send(buff, n);
+	while(!uart_done());
 }
 
 void fun8(void)
@@ -376,23 +398,11 @@ void fun8(void)
 		
 		if (n)
 		{
-			_delay_ms(100);
-			n = uart_available();			
-			uart_get(buff, n);
-			set_terminal(TERMINAL_3);
-			uart_send(buff, n);
-			while(!uart_done());
-			_delay_ms(200);
-			n = receive();
+			n = send_to_slave(buff, n);
 			
 			if (n)
 			{
-				n = uart_available();
-				uart_get(buff, n);
-				set_terminal(terminal);
-				uart_send(buff, n);
-				while(!uart_done());
-				_delay_ms(100);
+				send_back_to_terminal(buff, n, terminal);
 			}
 		}
 		
