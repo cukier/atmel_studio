@@ -291,7 +291,7 @@ void fun6(void)
 		set_terminal(terminal);
 		uart_printf("Terminal %u\n\r", terminal);
 		while(!uart_done());
-		tries = 500;
+		tries = 50;
 		n = 0;
 		
 		do
@@ -308,6 +308,8 @@ void fun6(void)
 		{
 			terminal = TERMINAL_1;
 		}
+		
+		TOGGLE(LED);
 	}
 	
 }
@@ -337,8 +339,80 @@ void fun7(void)
 	}
 }
 
+uint16_t receive(void)
+{
+	uint16_t tries, n;
+	
+	tries = 10;
+	n = 0;
+	
+	do
+	{
+		n = uart_available();
+		_delay_ms(10);
+		
+		//if (n == uart_available())
+		//{
+		//tries = 1;
+		//}
+	} while (--tries);
+	
+	return n;
+}
+
+void fun8(void)
+{
+	enum Terminais terminal = TERMINAL_1;
+	uint16_t n;
+	uint8_t buff[128];
+	
+	m_init();
+	
+	while(1)
+	{
+		set_terminal(terminal);
+		n = 0;
+		n = receive();
+		
+		if (n) //existe informacao a ser enviada ao escravo
+		{
+			_delay_ms(100);
+			n = uart_available();
+			
+			if (n)
+			{
+				uart_get(buff, n);
+				set_terminal(TERMINAL_3);
+				uart_send(buff, n);
+				while(!uart_done());
+				_delay_ms(300);
+				n = receive();
+				
+				if (n)
+				{
+					n = uart_available();
+					uart_get(buff, n);
+					set_terminal(terminal);
+					uart_send(buff, n);
+					while(!uart_done());
+					_delay_ms(100);
+				}
+			}
+		}
+		
+		++terminal;
+		
+		if (terminal > TERMINAL_2)
+		{
+			terminal = TERMINAL_1;
+		}
+		
+		TOGGLE(LED);
+	}
+}
+
 int main(void)
 {
-	fun7();
+	fun8();
 	return 0;
 }
