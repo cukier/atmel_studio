@@ -343,7 +343,7 @@ uint16_t receive(void)
 {
 	uint16_t tries, n;
 	
-	tries = 10;
+	tries = 50;
 	n = 0;
 	
 	do
@@ -351,10 +351,10 @@ uint16_t receive(void)
 		n = uart_available();
 		_delay_ms(10);
 		
-		//if (n == uart_available())
-		//{
-		//tries = 1;
-		//}
+		if (!n && tries == 5)
+		{
+			tries = 1;
+		}
 	} while (--tries);
 	
 	return n;
@@ -374,29 +374,25 @@ void fun8(void)
 		n = 0;
 		n = receive();
 		
-		if (n) //existe informacao a ser enviada ao escravo
+		if (n)
 		{
 			_delay_ms(100);
-			n = uart_available();
+			n = uart_available();			
+			uart_get(buff, n);
+			set_terminal(TERMINAL_3);
+			uart_send(buff, n);
+			while(!uart_done());
+			_delay_ms(200);
+			n = receive();
 			
 			if (n)
 			{
+				n = uart_available();
 				uart_get(buff, n);
-				set_terminal(TERMINAL_3);
+				set_terminal(terminal);
 				uart_send(buff, n);
 				while(!uart_done());
-				_delay_ms(300);
-				n = receive();
-				
-				if (n)
-				{
-					n = uart_available();
-					uart_get(buff, n);
-					set_terminal(terminal);
-					uart_send(buff, n);
-					while(!uart_done());
-					_delay_ms(100);
-				}
+				_delay_ms(100);
 			}
 		}
 		
