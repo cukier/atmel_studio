@@ -12,12 +12,12 @@
 
 int main(void)
 {
-	DDRC |= _BV(DDC0);
+	DDRB |= _BV(DDB5);
     
     while (1) 
     {
-		PORTC ^= _BV(PORTC0);
-		_delay_ms(500);
+		PORTB ^= _BV(PORTB5);
+		_delay_ms(100);
     }
 	
 	return 0;

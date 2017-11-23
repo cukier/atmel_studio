@@ -12,7 +12,7 @@
 #define LEITURAS		1000
 #define ADR_T1			C,0
 #define ADR_T2			C,1
-#define LED				C,5
+#define LED				B,5
 
 enum Terminais
 {
@@ -86,6 +86,17 @@ void m_init(void)
 	_delay_ms(500);
 }
 
+void blink_led(void)
+{
+	m_init();
+	
+	while(1)
+	{
+		TOGGLE(LED);
+		_delay_ms(500);
+	}
+}
+
 void fun1(void)
 {
 	enum Terminais terminal;
@@ -100,7 +111,7 @@ void fun1(void)
 			terminal_printf(terminal, "Hello Terminal %d\n\r", terminal);
 		}
 		
-		TOGGLE(LED);
+		//TOGGLE(LED);
 		_delay_ms(500);
 	}
 }
@@ -291,7 +302,7 @@ void fun6(void)
 		set_terminal(terminal);
 		uart_printf("Terminal %u\n\r", terminal);
 		while(!uart_done());
-		tries = 50;
+		tries = 200;
 		n = 0;
 		
 		do
@@ -419,6 +430,6 @@ void fun8(void)
 
 int main(void)
 {
-	fun8();
+	fun1();
 	return 0;
 }
