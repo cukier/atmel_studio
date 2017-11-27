@@ -12,7 +12,8 @@
 #define LEITURAS		1000
 #define ADR_T1			C,0
 #define ADR_T2			C,1
-#define LED				B,5
+//#define LED				B,5
+#define LED				C,5
 
 enum Terminais
 {
@@ -383,6 +384,58 @@ uint16_t receive(void)
 	return n;
 }
 
+void fun8(void)
+{
+	enum Terminais terminal = TERMINAL_1;
+	uint16_t n;
+	uint8_t buff[128];
+	
+	m_init();
+	
+	while(1)
+	{
+		set_terminal(terminal);
+		n = 0;
+		n = receive();
+		
+		if (n)
+		{
+			_delay_ms(100);
+			n = uart_available();
+			
+			if (n)
+			{
+				uart_get(buff, n);
+				set_terminal(TERMINAL_3);
+				uart_send(buff, n);
+				while(!uart_done());
+				_delay_ms(300);
+				n = receive();
+				
+				if (n)
+				{
+					n = uart_available();
+					uart_get(buff, n);
+					set_terminal(terminal);
+					uart_send(buff, n);
+					while(!uart_done());
+					_delay_ms(100);
+				}
+			}
+		}
+		
+		++terminal;
+		
+		if (terminal > TERMINAL_2)
+		{
+			terminal = TERMINAL_1;
+		}
+		
+		TOGGLE(LED);
+	}
+	
+}
+
 void fun_aux(uint8_t *buff, enum Terminais terminal)
 {
 	uint8_t n;
@@ -390,9 +443,10 @@ void fun_aux(uint8_t *buff, enum Terminais terminal)
 	_delay_ms(100);
 	n = uart_available();
 	uart_get(buff, n);
-	set_terminal(TERMINAL_3);
+	set_terminal(terminal);
 	uart_send(buff, n);
 	while(!uart_done());
+	_delay_ms(300);
 }
 
 uint16_t send_to_slave(uint8_t *buff)
@@ -417,10 +471,9 @@ void send_back_to_terminal(uint8_t *buff, enum Terminais terminal)
 	//uart_send(buff, n);
 	//while(!uart_done());
 	fun_aux(buff, terminal);
-	_delay_ms(300);
 }
 
-void fun8(void)
+void fun8_2(void)
 {
 	enum Terminais terminal = TERMINAL_1;
 	uint16_t n;
@@ -457,6 +510,6 @@ void fun8(void)
 
 int main(void)
 {
-	fun8();
+	fun8_2();
 	return 0;
 }
