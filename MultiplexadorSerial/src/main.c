@@ -312,10 +312,22 @@ void fun6(void)
 		} while (--tries);
 		
 		uart_printf("Terminal %u %u bytes\n\r", terminal, n);
+		
+		if (n)
+		{
+			while(--n)
+			{
+				uart_printf("r: %u %u ", n, uart_getc());
+			}
+			
+			uart_printf("\n\r");
+		}
+		
 		while(!uart_done());
+		_delay_ms(200);
 		++terminal;
 		
-		if (terminal > TERMINAL_3)
+		if (terminal > TERMINAL_2)
 		{
 			terminal = TERMINAL_1;
 		}
@@ -371,26 +383,41 @@ uint16_t receive(void)
 	return n;
 }
 
-uint16_t send_to_slave(uint8_t *buff, uint16_t n)
+void fun_aux(uint8_t *buff, enum Terminais terminal)
 {
+	uint8_t n;
+	
 	_delay_ms(100);
 	n = uart_available();
 	uart_get(buff, n);
 	set_terminal(TERMINAL_3);
 	uart_send(buff, n);
 	while(!uart_done());
+}
+
+uint16_t send_to_slave(uint8_t *buff)
+{
+	//_delay_ms(100);
+	//n = uart_available();
+	//uart_get(buff, n);
+	//set_terminal(TERMINAL_3);
+	//uart_send(buff, n);
+	//while(!uart_done());
+	fun_aux(buff, TERMINAL_3);
 	
 	return receive();
 }
 
-void send_back_to_terminal(uint8_t *buff, uint16_t n, enum Terminais terminal)
+void send_back_to_terminal(uint8_t *buff, enum Terminais terminal)
 {
-	_delay_ms(100);
-	n = uart_available();
-	uart_get(buff, n);
-	set_terminal(terminal);
-	uart_send(buff, n);
-	while(!uart_done());
+	//_delay_ms(100);
+	//n = uart_available();
+	//uart_get(buff, n);
+	//set_terminal(terminal);
+	//uart_send(buff, n);
+	//while(!uart_done());
+	fun_aux(buff, terminal);
+	_delay_ms(300);
 }
 
 void fun8(void)
@@ -409,11 +436,11 @@ void fun8(void)
 		
 		if (n)
 		{
-			n = send_to_slave(buff, n);
+			n = send_to_slave(buff);
 			
 			if (n)
 			{
-				send_back_to_terminal(buff, n, terminal);
+				send_back_to_terminal(buff, terminal);
 			}
 		}
 		
@@ -430,6 +457,6 @@ void fun8(void)
 
 int main(void)
 {
-	fun1();
+	fun8();
 	return 0;
 }
