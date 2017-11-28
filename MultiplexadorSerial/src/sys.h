@@ -8,6 +8,8 @@
 #ifndef SRC_SYS_H_
 #define SRC_SYS_H_
 
+#include <avr/io.h>
+
 #if !(_SLOW_XTAL) && ! (_FAST_XTAL)
 #error "Definir cristal "_SLOW_XTAL" ou "_FAST_XTAL""
 #endif
@@ -73,6 +75,13 @@
 #ifdef _LOW_SPEED_BAUD
 #define BAUD							9600
 #endif
+
+#define BUFFER_SIZE		32
+#define LEITURAS		1000
+#define ADR_T1			C,0
+#define ADR_T2			C,1
+//#define LED				B,5
+#define LED				C,5
 
 #ifdef __DEBUG
 void debug_msg(const char *str, ...);

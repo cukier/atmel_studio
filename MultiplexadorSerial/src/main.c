@@ -1,73 +1,14 @@
 #include "sys.h"
 #include "uart.h"
+#include "terminais.h"
+#include "led.h"
+#include "servico_modbus.h"
 
-#include <avr/io.h>
 #include <util/delay.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <avr/interrupt.h>
 #include <stdbool.h>
-
-#define BUFFER_SIZE		32
-#define LEITURAS		1000
-#define ADR_T1			C,0
-#define ADR_T2			C,1
-#define LED				C,5
-
-enum Terminais
-{
-	TERMINAL_1 = 1,
-	TERMINAL_2,
-	TERMINAL_3,
-	TERMINAL_4
-};
-
-void set_terminal(enum Terminais t)
-{
-	switch(t)
-	{
-		default:
-		case TERMINAL_1:
-		RESET(ADR_T1);
-		RESET(ADR_T2);
-		break;
-		
-		case TERMINAL_2:
-		SET(ADR_T1);
-		RESET(ADR_T2);
-		break;
-		
-		case TERMINAL_3:
-		RESET(ADR_T1);
-		SET(ADR_T2);
-		break;
-		
-		case TERMINAL_4:
-		SET(ADR_T1);
-		SET(ADR_T2);
-		break;
-	}
-	
-	_delay_ms(10);
-	uart_flush();
-}
-
-void terminal_printf(enum Terminais terminal, const char str[], ...)
-{
-	char buffer[BUFFER_SIZE];
-	va_list args;
-	
-	set_terminal(terminal);
-	va_start(args, str);
-	vsnprintf(buffer, BUFFER_SIZE, str, args);
-	va_end(args);
-	uart_puts(buffer);
-	
-	while(!uart_done());
-	_delay_ms(5);
-	
-	return;
-}
 
 void m_init(void)
 {
@@ -79,9 +20,8 @@ void m_init(void)
 	uart_init(UART_BAUD_SELECT_DOUBLE_SPEED(BAUD, F_CPU));
 	#endif
 	
-	SET_OUTPUT(ADR_T1);
-	SET_OUTPUT(ADR_T2);
-	SET_OUTPUT(LED);
+	terminais_init();
+	led_init();
 	sei();
 	_delay_ms(500);
 }
@@ -100,7 +40,7 @@ void fun1(void)
 			terminal_printf(terminal, "Hello Terminal %d\n\r", terminal);
 		}
 		
-		TOGGLE(LED);
+		//TOGGLE(LED);
 		_delay_ms(500);
 	}
 }
@@ -114,21 +54,6 @@ void fun2(void)
 	_delay_ms(1000);
 	
 	while(1);
-}
-
-uint16_t listenin(void)
-{
-	uint16_t n;
-	
-	n = 0;
-	
-	do
-	{
-		n = uart_available();
-		_delay_ms(10);
-	} while (n != uart_available());
-	
-	return n;
 }
 
 void fun3(void)
@@ -170,30 +95,6 @@ void fun3(void)
 			} //if (listenin())
 		} //for terminal
 	} //while(1)
-}
-
-bool get_from_slave(uint8_t *data, uint16_t len)
-{
-	uint16_t i, tries = 10, n = 0;
-	
-	set_terminal(TERMINAL_3);
-	uart_flush();
-	
-	for (i = 0; i < len; ++i)
-	{
-		uart_putc(data[i]);
-	}
-	
-	while(uart_done());
-	
-	do
-	{
-		_delay_ms(100);
-	} while ((uart_available() == 0) && (--tries));
-	
-	_delay_ms(100);
-	
-	return (((n != 0)) & ((tries != 0)));
 }
 
 void fun4(void)
@@ -291,7 +192,7 @@ void fun6(void)
 		set_terminal(terminal);
 		uart_printf("Terminal %u\n\r", terminal);
 		while(!uart_done());
-		tries = 50;
+		tries = 200;
 		n = 0;
 		
 		do
@@ -301,17 +202,28 @@ void fun6(void)
 		} while (--tries);
 		
 		uart_printf("Terminal %u %u bytes\n\r", terminal, n);
+		
+		if (n)
+		{
+			while(--n)
+			{
+				uart_printf("r: %u %u ", n, uart_getc());
+			}
+			
+			uart_printf("\n\r");
+		}
+		
 		while(!uart_done());
+		_delay_ms(200);
 		++terminal;
 		
-		if (terminal > TERMINAL_3)
+		if (terminal > TERMINAL_2)
 		{
 			terminal = TERMINAL_1;
 		}
 		
 		TOGGLE(LED);
 	}
-	
 }
 
 void fun7(void)
@@ -339,49 +251,6 @@ void fun7(void)
 	}
 }
 
-uint16_t receive(void)
-{
-	uint16_t tries, n;
-	
-	tries = 10;
-	n = 0;
-	
-	do
-	{
-		n = uart_available();
-		_delay_ms(10);
-		
-		//if (!n && tries == 45)
-		//{
-		//tries = 1;
-		//}
-	} while (--tries);
-	
-	return n;
-}
-
-uint16_t send_to_slave(uint8_t *buff, uint16_t n)
-{
-	_delay_ms(100);
-	n = uart_available();
-	uart_get(buff, n);
-	set_terminal(TERMINAL_3);
-	uart_send(buff, n);
-	while(!uart_done());
-	
-	return receive();
-}
-
-void send_back_to_terminal(uint8_t *buff, uint16_t n, enum Terminais terminal)
-{
-	_delay_ms(100);
-	n = uart_available();
-	uart_get(buff, n);
-	set_terminal(terminal);
-	uart_send(buff, n);
-	while(!uart_done());
-}
-
 void fun8(void)
 {
 	enum Terminais terminal = TERMINAL_1;
@@ -398,11 +267,63 @@ void fun8(void)
 		
 		if (n)
 		{
-			n = send_to_slave(buff, n);
+			_delay_ms(100);
+			n = uart_available();
 			
 			if (n)
 			{
-				send_back_to_terminal(buff, n, terminal);
+				uart_get(buff, n);
+				set_terminal(TERMINAL_3);
+				uart_send(buff, n);
+				while(!uart_done());
+				_delay_ms(300);
+				n = receive();
+				
+				if (n)
+				{
+					n = uart_available();
+					uart_get(buff, n);
+					set_terminal(terminal);
+					uart_send(buff, n);
+					while(!uart_done());
+					_delay_ms(100);
+				}
+			}
+		}
+		
+		++terminal;
+		
+		if (terminal > TERMINAL_2)
+		{
+			terminal = TERMINAL_1;
+		}
+		
+		TOGGLE(LED);
+	}
+	
+}
+
+void fun8_2(void)
+{
+	enum Terminais terminal = TERMINAL_1;
+	uint16_t n;
+	uint8_t buff[128];
+	
+	m_init();
+	
+	while(1)
+	{
+		set_terminal(terminal);
+		n = 0;
+		n = receive();
+		
+		if (n)
+		{
+			n = send_to_slave(buff);
+			
+			if (n)
+			{
+				send_back_to_terminal(buff, terminal);
 			}
 		}
 		
@@ -419,6 +340,6 @@ void fun8(void)
 
 int main(void)
 {
-	fun8();
+	fun8_2();
 	return 0;
 }

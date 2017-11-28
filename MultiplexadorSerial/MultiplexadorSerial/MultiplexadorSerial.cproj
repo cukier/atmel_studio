@@ -120,13 +120,37 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\src\led.c">
+      <SubType>compile</SubType>
+      <Link>led.c</Link>
+    </Compile>
+    <Compile Include="..\src\led.h">
+      <SubType>compile</SubType>
+      <Link>led.h</Link>
+    </Compile>
     <Compile Include="..\src\main.c">
       <SubType>compile</SubType>
       <Link>main.c</Link>
     </Compile>
+    <Compile Include="..\src\servico_modbus.c">
+      <SubType>compile</SubType>
+      <Link>servico_modbus.c</Link>
+    </Compile>
+    <Compile Include="..\src\servico_modbus.h">
+      <SubType>compile</SubType>
+      <Link>servico_modbus.h</Link>
+    </Compile>
     <Compile Include="..\src\sys.h">
       <SubType>compile</SubType>
       <Link>sys.h</Link>
+    </Compile>
+    <Compile Include="..\src\terminais.c">
+      <SubType>compile</SubType>
+      <Link>terminais.c</Link>
+    </Compile>
+    <Compile Include="..\src\terminais.h">
+      <SubType>compile</SubType>
+      <Link>terminais.h</Link>
     </Compile>
     <Compile Include="..\src\uart.c">
       <SubType>compile</SubType>
