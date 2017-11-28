@@ -5,18 +5,29 @@
 
 int main(void)
 {
-	Timer t, t1;
+	Timer t;
+	bool ctrl = true;
 	
-	t.init();
-	t.set_mode(TIMER0_DIV_256);
-	t.start();
+	t.init(TIMER0_DIV_1024);
 	sei();
 	
 	while(1)
 	{
-		if (t1.get_timer() == 12)
+		if (t.get_timer() > 5)
 		{
-			t1.stop();
+			t.set_timer(0);
+			
+			
+			if (ctrl)
+			{
+				ctrl = false;
+				t.set_mode(TIMER0_DIV_256);
+			}
+			else
+			{
+				ctrl = true;
+				t.set_mode(TIMER0_DIV_1024);
+			}
 		}
 	}
 	

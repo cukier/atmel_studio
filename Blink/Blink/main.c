@@ -12,12 +12,28 @@
 
 int main(void)
 {
-	DDRB |= _BV(DDB5);
+	uint16_t cont = 0;
+	
+	DDRB |= _BV(DDB1);
     
     while (1) 
     {
-		PORTB ^= _BV(PORTB5);
-		_delay_ms(100);
+		PORTB ^= _BV(PORTB1);
+		
+		if (cont < 1600)
+		{
+			_delay_us(100);
+		}
+		else if (cont < 2000)
+		{
+			_delay_us(300);
+		}
+		else
+		{
+			cont = 0;
+		}
+		
+		++cont;
     }
 	
 	return 0;
