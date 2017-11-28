@@ -10,7 +10,9 @@ enum Timer0_Clock
 };
 
 class Timer
-{	
+{
+	static bool init_ok;
+	
 	public:
 	void init(enum Timer0_Clock mode);
 	void start(void);

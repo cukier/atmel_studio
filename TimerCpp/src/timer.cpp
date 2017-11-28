@@ -2,6 +2,8 @@
 
 #include <avr/interrupt.h>
 
+bool Timer::init_ok = true;
+
 namespace __Timer
 {
 	uint16_t count = 0;
@@ -21,12 +23,16 @@ ISR(TIMER0_OVF_vect)
 
 void Timer::init(enum Timer0_Clock mode)
 {
-	__Timer::count = 0;
-	__Timer::run = true;
-	DDRB |= (1 << DDB5);
-	set_mode(mode);
-	TIMSK0 |= (1 << TOIE0);
-	TCNT0 = 0;
+	if (init_ok)
+	{
+		this->init_ok = false;
+		__Timer::count = 0;
+		__Timer::run = true;
+		DDRB |= (1 << DDB5);
+		set_mode(mode);
+		TIMSK0 |= (1 << TOIE0);
+		TCNT0 = 0;
+	}
 }
 
 void Timer::start()
@@ -59,7 +65,7 @@ void Timer::set_timer(uint16_t i_time)
 }
 
 void Timer::set_mode(Timer0_Clock mode)
-{	
+{
 	switch (mode)
 	{
 		case TIMER0_OFF :
