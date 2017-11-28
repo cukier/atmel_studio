@@ -155,6 +155,10 @@
       <SubType>compile</SubType>
       <Link>main.cpp</Link>
     </Compile>
+    <Compile Include="..\src\serial.h">
+      <SubType>compile</SubType>
+      <Link>serial.h</Link>
+    </Compile>
     <Compile Include="..\src\sys.h">
       <SubType>compile</SubType>
       <Link>sys.h</Link>

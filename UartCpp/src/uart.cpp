@@ -38,7 +38,7 @@ ISR(USART_RX_vect)
 	
 	tmphead = (UART_RxHead + 1) & UART_RX0_BUFFER_MASK;
 	
-	if (!(tmphead == UART_RxTail))
+	if (tmphead != UART_RxTail)
 	{
 		UART_RxHead = tmphead;
 		UART_RxBuf[tmphead] = UDR0;
