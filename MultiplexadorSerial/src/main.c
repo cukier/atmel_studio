@@ -338,6 +338,22 @@ void fun8_2(void)
 	}
 }
 
+void fun9(void)
+{
+	enum Terminais terminal = TERMINAL_1;
+	uint16_t n;
+	uint8_t buff[128];
+	
+	m_init();
+	
+	while(1)
+	{
+		set_terminal(terminal);
+		n = 0;
+		n = listenin();
+	}
+}
+
 int main(void)
 {
 	fun8_2();
