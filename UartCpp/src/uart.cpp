@@ -159,7 +159,7 @@ void Uart::send(uint8_t *data, uint16_t len)
 void uart_puts(const char *s)
 {
 	while (*s) {
-		putchar(*s++);
+		Uart::put_char(*s++);
 	}
 }
 

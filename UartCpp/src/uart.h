@@ -22,7 +22,7 @@ class Uart
 	void flush(void);
 	bool done(void);
 	void get(uint8_t *data, uint16_t len);
-	void put_char(uint8_t data);
+	static void put_char(uint8_t data);
 	void send(uint8_t *data, uint16_t len);
 	void puts(const char *s);
 	void printf(char *format, ...);
