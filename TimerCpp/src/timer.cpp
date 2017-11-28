@@ -4,29 +4,42 @@
 
 namespace __Timer
 {
-	uint16_t count;
+	uint16_t count = 0;
+	bool run = false;
 }
 
 ISR(TIMER0_OVF_vect)
 {
-	__Timer::count++;
+	if (__Timer::run)
+	{
+		__Timer::count++;
+	}
+	
 	PORTB ^= (1 << PORTB5);
+	TCNT0 = 0;
 }
 
-void Timer::init()
+void Timer::init(enum Timer0_Clock mode)
 {
+	__Timer::count = 0;
+	__Timer::run = true;
 	DDRB |= (1 << DDB5);
+	set_mode(mode);
 	TIMSK0 |= (1 << TOIE0);
 	TCNT0 = 0;
-	mode = TIMER0_DIV_1;
 }
 
 void Timer::start()
 {
-	set_mode(Timer::mode);
+	__Timer::run = true;
 }
 
 void Timer::stop()
+{
+	__Timer::run = false;
+}
+
+void Timer::kill()
 {
 	TCCR0B = 0;
 }
@@ -40,10 +53,13 @@ uint16_t Timer::get_timer()
 	return ret;
 }
 
-void Timer::set_mode(Timer0_Clock mode)
+void Timer::set_timer(uint16_t i_time)
 {
-	Timer::mode = mode;
-	
+	__Timer::count = i_time;
+}
+
+void Timer::set_mode(Timer0_Clock mode)
+{	
 	switch (mode)
 	{
 		case TIMER0_OFF :

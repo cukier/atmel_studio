@@ -10,15 +10,14 @@ enum Timer0_Clock
 };
 
 class Timer
-{
-	enum Timer0_Clock mode;
-	
+{	
 	public:
-	
-	void init(void);
+	void init(enum Timer0_Clock mode);
 	void start(void);
 	void stop(void);
+	void kill();
 	uint16_t get_timer(void);
+	void set_timer(uint16_t i_time);
 	void set_mode(Timer0_Clock mode);
 };
 
