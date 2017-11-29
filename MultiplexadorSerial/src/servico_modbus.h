@@ -11,6 +11,6 @@ extern uint16_t receive(void);
 extern bool get_from_slave(uint8_t *data, uint16_t len);
 extern uint16_t send_to_slave(uint8_t *buff);
 extern void send_back_to_terminal(uint8_t *buff, enum Terminais terminal);
-extern void get_memoria(void);
+//extern void get_memoria(void);
 
 #endif

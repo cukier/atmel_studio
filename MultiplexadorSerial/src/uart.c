@@ -38,7 +38,7 @@ ISR(USART_RX_vect)
 	
 	tmphead = (UART_RxHead + 1) & UART_RX0_BUFFER_MASK;
 	
-	if (!(tmphead == UART_RxTail))
+	if (tmphead != UART_RxTail)
 	{
 		UART_RxHead = tmphead;
 		UART_RxBuf[tmphead] = UDR0;
@@ -65,8 +65,7 @@ void uart_init(uint16_t baudrate)
 	UBRR0L = (uint8_t) baudrate;
 	
 	UCSR0B = (1<<RXEN0)|(1<<TXEN0)|(1<<RXCIE0);
-	//UCSR0C = (1<<URSEL0)|(3<<UCSZ00);
-	UCSR0C = (3<<UCSZ00);
+	UCSR0C = (3<<UCSZ00)|(1<<UPM01);
 }
 
 uint16_t uart_available(void)

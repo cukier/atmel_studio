@@ -38,9 +38,11 @@ void fun1(void)
 		for (terminal = TERMINAL_1; terminal <= TERMINAL_4; ++terminal)
 		{
 			terminal_printf(terminal, "Hello Terminal %d\n\r", terminal);
+			led_reset();
+			(terminal & 0x01) ? led_set(COR_VD) : led_set(COR_VM);
 		}
 		
-		//TOGGLE(LED);
+		//led_flash(COR_VM);
 		_delay_ms(500);
 	}
 }
@@ -351,11 +353,28 @@ void fun9(void)
 		set_terminal(terminal);
 		n = 0;
 		n = listenin();
+		
+		if (n)
+		{
+			_delay_ms(300);
+			send_to_slave(buff);
+			send_back_to_terminal(buff, terminal);
+		}
+		
+		++terminal;
+		
+		if (terminal > TERMINAL_2)
+		{
+			terminal = TERMINAL_1;
+		}
+		
+		TOGGLE(LED);
 	}
 }
 
 int main(void)
 {
-	fun8_2();
+	fun1();
+	
 	return 0;
 }

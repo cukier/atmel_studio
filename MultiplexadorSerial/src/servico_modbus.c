@@ -7,14 +7,22 @@
 uint16_t listenin(void)
 {
 	uint16_t n;
+	bool ok;
 	
 	n = 0;
+	ok = false;
 	
 	do
 	{
 		n = uart_available();
 		_delay_ms(10);
-	} while (n != uart_available());
+		ok = n != uart_available();
+		
+		if (ok)
+		{
+			_delay_ms(100);
+		}
+	} while (ok);
 	
 	return n;
 }
@@ -81,7 +89,8 @@ uint16_t send_to_slave(uint8_t *buff)
 {
 	fun_aux(buff, TERMINAL_3);
 	
-	return receive();
+	//return receive();
+	return listenin();
 }
 
 void send_back_to_terminal(uint8_t *buff, enum Terminais terminal)
@@ -89,7 +98,7 @@ void send_back_to_terminal(uint8_t *buff, enum Terminais terminal)
 	fun_aux(buff, terminal);
 }
 
-void get_memoria()
-{
-	
-}
+//void get_memoria()
+//{
+//
+//}

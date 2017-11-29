@@ -69,7 +69,7 @@
 #endif
 
 #ifdef _HIGH_SPEED_BAUD
-#define BAUD							57600
+#define BAUD							115200
 #endif
 
 #ifdef _LOW_SPEED_BAUD
@@ -80,8 +80,9 @@
 #define LEITURAS		1000
 #define ADR_T1			C,0
 #define ADR_T2			C,1
-//#define LED				B,5
-#define LED				C,5
+#define LED				B,5
+#define LED_1			B,0
+#define LED_2			B,1
 
 #ifdef __DEBUG
 void debug_msg(const char *str, ...);
