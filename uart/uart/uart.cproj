@@ -112,7 +112,6 @@
   <avrgcc.compiler.symbols.DefSymbols>
     <ListValues>
       <Value>DEBUG</Value>
-      <Value>_SLOW_XTAL</Value>
       <Value>_LOW_SPEED_BAUD</Value>
     </ListValues>
   </avrgcc.compiler.symbols.DefSymbols>

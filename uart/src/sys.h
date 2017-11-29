@@ -8,14 +8,6 @@
 #ifndef SRC_SYS_H_
 #define SRC_SYS_H_
 
-#if !(_SLOW_XTAL) && ! (_FAST_XTAL)
-#error "Definir cristal "_SLOW_XTAL" ou "_FAST_XTAL""
-#endif
-
-#if !(_HIGH_SPEED_BAUD) && ! (_LOW_SPEED_BAUD)
-#error "Definir baud "_HIGH_SPEED_BAUD" (115200) ou "_LOW_SPEED_BAUD" (9600)"
-#endif
-
 #define	PORT(x)							_port2(x)
 #define	DDR(x)							_ddr2(x)
 #define	PIN(x)							_pin2(x)
@@ -60,18 +52,14 @@
 
 #ifdef _SLOW_XTAL
 #define F_CPU							4000000ULL
-#endif
-
-#ifdef _FAST_XTAL
+#else
 #define F_CPU							16000000ULL
-#endif
-
-#ifdef _HIGH_SPEED_BAUD
-#define BAUD							57600
 #endif
 
 #ifdef _LOW_SPEED_BAUD
 #define BAUD							9600
+#else
+#define BAUD							115200
 #endif
 
 #ifdef __DEBUG

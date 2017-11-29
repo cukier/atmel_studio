@@ -11,7 +11,14 @@
 
 int main(void)
 {
+	uint16_t n;
+	
+	#ifdef _LOW_SPEED_BAUD
 	uart_init(UART_BAUD_SELECT(BAUD, F_CPU));
+	#else
+	uart_init(UART_BAUD_SELECT_DOUBLE_SPEED(BAUD, F_CPU));
+	#endif // _LOW_SPEED_BAUD
+	
 	SET_OUTPUT(ADR_T1);
 	SET_OUTPUT(ADR_T2);
 	SET_OUTPUT(LED);
@@ -24,11 +31,22 @@ int main(void)
 		TOGGLE(LED);
 		uart_printf("Hello\n\r");
 		_delay_ms(500);
+		n = 0;
+		n = uart_available();
 		
-		if (uart_available())
+		if (n)
 		{
 			_delay_ms(100);
+			n = uart_available();
 			uart_printf("Recebido %u\n\r", uart_available());
+			
+			while(--n)
+			{
+				uart_printf("%u:%c ", n, uart_getc());
+			}
+			
+			uart_printf("%u:%c\n", n, uart_getc());
+			_delay_ms(500);
 			uart_flush();
 		}
 	}
