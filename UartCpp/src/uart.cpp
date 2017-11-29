@@ -156,7 +156,7 @@ void Uart::send(uint8_t *data, uint16_t len)
 	UCSR0B |= (1<<UDRIE0);
 }
 
-void uart_puts(const char *s)
+void Uart::put_s(const char *s)
 {
 	while (*s) {
 		Uart::put_char(*s++);
@@ -171,5 +171,5 @@ void Uart::printf(char *format, ...)
 	va_start(args, format);
 	vsnprintf(uart_buffer, 128, format, args);
 	va_end(args);
-	uart_puts(uart_buffer);
+	Uart::put_s(uart_buffer);
 }

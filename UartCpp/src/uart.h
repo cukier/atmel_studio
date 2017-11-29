@@ -24,7 +24,7 @@ class Uart
 	static void get(uint8_t *data, uint16_t len);
 	static void put_char(uint8_t data);
 	static void send(uint8_t *data, uint16_t len);
-	static void puts(const char *s);
+	static void put_s(const char *s);
 	static void printf(char *format, ...);
 };
 
