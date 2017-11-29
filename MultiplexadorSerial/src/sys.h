@@ -69,7 +69,7 @@
 #endif
 
 #ifdef _HIGH_SPEED_BAUD
-#define BAUD							115200
+#define BAUD							19200
 #endif
 
 #ifdef _LOW_SPEED_BAUD

@@ -49,7 +49,7 @@
 #define make8(v, o)						((uint8_t) (((v >> (o * 8)) & 0xff)))
 
 #define F_CPU							16000000ULL
-#define BAUD							115200
+#define BAUD							19200
 
 #ifdef USART1_ENABLED
 #define BAUD_2							9600

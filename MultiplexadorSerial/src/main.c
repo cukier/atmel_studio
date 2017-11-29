@@ -1,7 +1,7 @@
 #include "sys.h"
 #include "uart.h"
 #include "terminais.h"
-#include "led.h"
+//#include "led.h"
 #include "servico_modbus.h"
 
 #include <util/delay.h>
@@ -21,7 +21,8 @@ void m_init(void)
 	#endif
 	
 	terminais_init();
-	led_init();
+	//led_init();
+	SET_OUTPUT(LED);
 	sei();
 	_delay_ms(500);
 }
@@ -38,8 +39,8 @@ void fun1(void)
 		for (terminal = TERMINAL_1; terminal <= TERMINAL_4; ++terminal)
 		{
 			terminal_printf(terminal, "Hello Terminal %d\n\r", terminal);
-			led_reset();
-			(terminal & 0x01) ? led_set(COR_VD) : led_set(COR_VM);
+			//led_reset();
+			//(terminal & 0x01) ? led_set(COR_VD) : led_set(COR_VM);
 		}
 		
 		//led_flash(COR_VM);
@@ -356,7 +357,7 @@ void fun9(void)
 		
 		if (n)
 		{
-			_delay_ms(300);
+			_delay_ms(10);
 			send_to_slave(buff);
 			send_back_to_terminal(buff, terminal);
 		}
@@ -374,7 +375,7 @@ void fun9(void)
 
 int main(void)
 {
-	fun1();
+	fun9();
 	
 	return 0;
 }

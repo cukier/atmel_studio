@@ -65,7 +65,7 @@ void uart_init(uint16_t baudrate)
 	UBRR0L = (uint8_t) baudrate;
 	
 	UCSR0B = (1<<RXEN0)|(1<<TXEN0)|(1<<RXCIE0);
-	UCSR0C = (3<<UCSZ00)|(1<<UPM01);
+	UCSR0C = (3<<UCSZ00);
 }
 
 uint16_t uart_available(void)
