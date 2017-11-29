@@ -48,8 +48,8 @@
 #define make16(h, l)					((uint16_t) (h & 0xff) * 0x100 + (l & 0xff))
 #define make8(v, o)						((uint8_t) (((v >> (o * 8)) & 0xff)))
 
-#define F_CPU							8000000ULL
-#define BAUD							9600
+#define F_CPU							16000000ULL
+#define BAUD							115200
 
 #ifdef USART1_ENABLED
 #define BAUD_2							9600

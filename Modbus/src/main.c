@@ -28,7 +28,7 @@ void debug_msg(const char *str, ...)
 	va_end(args);
 	SET(SERIAL_ADR);
 	_delay_ms(1);
-	uart0_puts(uart_buffer);
+	uart_puts(uart_buffer);
 	_delay_ms(100);
 	RESET(SERIAL_ADR);
 	_delay_ms(1);

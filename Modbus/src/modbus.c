@@ -128,7 +128,7 @@ bool modbus_init(uint16_t add1, uint16_t add2)
 bool modbus_init(uint16_t add1)
 #endif
 {	
-	uart_init(UART_BAUD_SELECT(BAUD, F_CPU));
+	uart_init(UART_BAUD_SELECT_DOUBLE_SPEED(BAUD, F_CPU));
 	
 	#ifdef USART1_ENABLED
 	uart1_init(UART_BAUD_SELECT(BAUD_2, F_CPU));
@@ -450,7 +450,7 @@ uint16_t modbus_get_register(uint8_t slv_addr, uint16_t register_address)
 		uart_flush();
 		_delay_ms(DELAY_REQUEST);
 		n = 0;
-		n = uart_get_rx_size();
+		n = uart_available();
 		
 		if (n == 7)
 		{
@@ -485,7 +485,7 @@ void modbus_set_register(uint8_t slv_addr, uint16_t register_address, uint16_t v
 	uart_send(request, 8);
 	_delay_ms(DELAY_REQUEST);
 	n = 0;
-	n = uart_get_rx_size();
+	n = uart_available();
 	modbus_err = (n != 0);
 	uart_flush();
 	
