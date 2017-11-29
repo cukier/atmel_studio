@@ -24,7 +24,7 @@ int main(void)
 	{
 		uart.put_s("Hello\n");
 		plc.teste_saidas();
-		_delay_ms(300);
+		_delay_ms(2000);
 	}
 	
 	return 0;

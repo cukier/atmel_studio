@@ -52,17 +52,8 @@
 #define make8(v, o)						((uint8_t) (((v >> (o * 8)) & 0xff)))
 #define swap(v)							((v << 8) | (v >> 8))
 
-#ifdef _FAST_XTAL
 #define F_CPU							16000000ULL
-#else
-#define F_CPU							4000000ULL
-#endif
-
-#ifdef _HIGH_SPEED_BAUD
-#define BAUD							115200
-#else
 #define BAUD							9600
-#endif
 
 #define Q0								B,0
 #define Q1								B,1

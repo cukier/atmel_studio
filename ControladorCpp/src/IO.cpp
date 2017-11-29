@@ -17,19 +17,19 @@ IO::IO()
 	SET_OUTPUT(Q1);
 	SET_OUTPUT(Q2);
 	SET_OUTPUT(Q3);
-	RESET(Q0);
-	RESET(Q1);
-	RESET(Q2);
-	RESET(Q3);
+	SET(Q0);
+	SET(Q1);
+	SET(Q2);
+	SET(Q3);
 	this->m_estado = 0;
 } //IO
 
 void IO::clear_all(void)
 {
-	RESET(Q0);
-	RESET(Q1);
-	RESET(Q2);
-	RESET(Q3);
+	SET(Q0);
+	SET(Q1);
+	SET(Q2);
+	SET(Q3);
 }
 
 // default destructor
@@ -49,22 +49,22 @@ void IO::teste_saidas(void)
 		
 		case 1:
 		this->clear_all();
-		SET(Q0);
+		RESET(Q0);
 		break;
 		
 		case 2:
 		this->clear_all();
-		SET(Q1);
+		RESET(Q1);
 		break;
 		
 		case 3:
 		this->clear_all();
-		SET(Q2);
+		RESET(Q2);
 		break;
 		
 		case 4:
 		this->clear_all();
-		SET(Q3);
+		RESET(Q3);
 		break;
 	}
 }
