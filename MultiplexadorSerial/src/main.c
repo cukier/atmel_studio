@@ -10,6 +10,23 @@
 #include <avr/interrupt.h>
 #include <stdbool.h>
 
+enum Terminais m_terminal;
+bool change_terminal;
+
+ISR(TIMER1_OVF_vect)
+{
+	TCNT1 = 0;
+	change_terminal = true;
+	//TOGGLE(LED);
+}
+
+void timer_1_init(void)
+{
+	TIMSK1 = (1<<TOIE1);
+	TCCR1B |= (1<<CS11)|(1<<CS10);
+	TCNT1 = 0;
+}
+
 void m_init(void)
 {
 	#ifdef _LOW_SPEED_BAUD
@@ -21,6 +38,7 @@ void m_init(void)
 	#endif
 	
 	terminais_init();
+	timer_1_init();
 	//led_init();
 	SET_OUTPUT(LED);
 	sei();
@@ -373,9 +391,57 @@ void fun9(void)
 	}
 }
 
+void fun10(void)
+{
+	enum Terminais terminal = TERMINAL_1;
+	uint16_t n;
+	uint8_t buff[128];
+	
+	m_init();
+	
+	while(1)
+	{
+		if (change_terminal)
+		{
+			change_terminal = false;
+			++terminal;
+			
+			if (terminal > TERMINAL_2)
+			{
+				terminal = TERMINAL_1;
+			}
+			
+			
+			set_terminal(terminal);
+			TOGGLE(LED);
+		}
+		
+		n = 0;
+		n = listenin();
+		
+		if (n)
+		{
+			//_delay_ms(10);
+			send_to_slave(buff);
+			send_back_to_terminal(buff, terminal);
+		}
+	}
+}
+
 int main(void)
 {
-	fun9();
+	timer_1_init();
+	SET_OUTPUT(LED);
+	sei();
+	
+	while(1)
+	{
+		if (change_terminal)
+		{
+			change_terminal = false;
+			TOGGLE(LED);
+		}
+	}
 	
 	return 0;
 }
