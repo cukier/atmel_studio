@@ -76,13 +76,17 @@ void fun_aux(uint8_t *buff, enum Terminais terminal)
 {
 	uint8_t n;
 	
-	//_delay_ms(100);
+	_delay_ms(10);
 	n = uart_available();
-	uart_get(buff, n);
-	set_terminal(terminal);
-	uart_send(buff, n);
-	while(!uart_done());
-	_delay_ms(50);
+	
+	if (n)
+	{
+		uart_get(buff, n);
+		set_terminal(terminal);
+		uart_send(buff, n);
+		while(!uart_done());
+		_delay_ms(300);
+	}
 }
 
 uint16_t send_to_slave(uint8_t *buff)

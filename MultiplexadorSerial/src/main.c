@@ -10,6 +10,9 @@
 #include <avr/interrupt.h>
 #include <stdbool.h>
 
+//#define TIMER_1_REG			((1<<CS12)|(1<<CS10)) //slow
+#define TIMER_1_REG				(1<<CS11) //fast
+
 enum Terminais m_terminal;
 bool change_terminal;
 
@@ -20,10 +23,17 @@ ISR(TIMER1_OVF_vect)
 	//TOGGLE(LED);
 }
 
-void timer_1_init(void)
+void timer_1_start(void)
 {
-	TIMSK1 = (1<<TOIE1);
-	TCCR1B |= (1<<CS11)|(1<<CS10);
+	TIMSK1 |= (1<<TOIE1);
+	TCCR1B |= TIMER_1_REG;
+	TCNT1 = 0;
+}
+
+void timer_1_stop(void)
+{
+	TIMSK1 &= ~(1<<TOIE1);
+	TCCR1B &= ~TIMER_1_REG;
 	TCNT1 = 0;
 }
 
@@ -38,7 +48,7 @@ void m_init(void)
 	#endif
 	
 	terminais_init();
-	timer_1_init();
+	timer_1_start();
 	//led_init();
 	SET_OUTPUT(LED);
 	sei();
@@ -397,6 +407,7 @@ void fun10(void)
 	uint16_t n;
 	uint8_t buff[128];
 	
+	timer_1_start();
 	m_init();
 	
 	while(1)
@@ -421,27 +432,18 @@ void fun10(void)
 		
 		if (n)
 		{
+			timer_1_stop();
 			//_delay_ms(10);
 			send_to_slave(buff);
 			send_back_to_terminal(buff, terminal);
+			timer_1_start();
 		}
 	}
 }
 
 int main(void)
 {
-	timer_1_init();
-	SET_OUTPUT(LED);
-	sei();
-	
-	while(1)
-	{
-		if (change_terminal)
-		{
-			change_terminal = false;
-			TOGGLE(LED);
-		}
-	}
+	fun10();
 	
 	return 0;
 }
