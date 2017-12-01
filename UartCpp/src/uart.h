@@ -26,6 +26,8 @@ class Uart
 	static void send(uint8_t *data, uint16_t len);
 	static void put_s(const char *s);
 	static void printf(char *format, ...);
+	Uart& operator <<(const char* msg);
+	template<typename T>
+	Uart& operator <<(const T num);
 };
-
 #endif

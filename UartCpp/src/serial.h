@@ -5,7 +5,7 @@
 
 namespace serial
 {
-	extern Uart uart;
+	Uart uart;
 }
 
 #endif

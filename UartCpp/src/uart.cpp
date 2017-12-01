@@ -173,3 +173,19 @@ void Uart::printf(char *format, ...)
 	va_end(args);
 	Uart::put_s(uart_buffer);
 }
+
+Uart& Uart::operator<<(const char* msg)
+{
+	while (*msg) {
+		Uart::put_char(*msg++);
+	}
+	
+	return *this;
+}
+
+template<typename T>
+Uart& Uart::operator<<(const T num)
+{
+	Uart::printf("%d", num);
+	return *this;
+}
