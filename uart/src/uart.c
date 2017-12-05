@@ -164,7 +164,7 @@ void uart_puts(const char *s)
 
 }
 
-void uart_printf(char *format, ...)
+void uart_printf(const char *format, ...)
 {
 	char uart_buffer[128];
 	va_list args;

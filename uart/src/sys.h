@@ -50,17 +50,8 @@
 #define make8(v, o)						((uint8_t) (((v >> (o * 8)) & 0xff)))
 #define swap(v)							((v << 8) | (v >> 8))
 
-#ifdef _SLOW_XTAL
 #define F_CPU							4000000ULL
-#else
-#define F_CPU							16000000ULL
-#endif
-
-#ifdef _LOW_SPEED_BAUD
 #define BAUD							9600
-#else
-#define BAUD							115200
-#endif
 
 #ifdef __DEBUG
 void debug_msg(const char *str, ...);

@@ -30,6 +30,6 @@ extern void uart_get(uint8_t *data, uint16_t len);
 extern void uart_putc(uint8_t data);
 extern void uart_send(uint8_t *data, uint16_t len);
 extern void uart_puts(const char *s);
-extern void uart_printf(char *format, ...);
+extern void uart_printf(const char *format, ...);
 
 #endif
