@@ -143,21 +143,6 @@ void Uart::put_char(uint8_t data)
 	UCSR0B |= (1<<UDRIE0);
 }
 
-void Uart::put_str(const char *str)
-{
-	uint16_t tmphead;
-	
-	while (*str)
-	{
-		tmphead = (UART_TxHead + 1) & UART_TX0_BUFFER_MASK;
-		while (tmphead == UART_TxTail);
-		UART_TxBuf[tmphead] = *str++;
-		UART_TxHead = tmphead;
-	}
-	
-	UCSR0B |= (1<<UDRIE0);
-}
-
 void Uart::send(uint8_t *data, uint16_t len)
 {
 	uint16_t tmphead, i;
@@ -175,9 +160,17 @@ void Uart::send(uint8_t *data, uint16_t len)
 
 void Uart::put_s(const char *s)
 {
-	while (*s) {
-		Uart::put_char(*s++);
+	uint16_t tmphead;
+	
+	while (*s)
+	{
+		tmphead = (UART_TxHead + 1) & UART_TX0_BUFFER_MASK;
+		while (tmphead == UART_TxTail);
+		UART_TxBuf[tmphead] = *s++;
+		UART_TxHead = tmphead;
 	}
+	
+	UCSR0B |= (1<<UDRIE0);
 }
 
 void Uart::printf(const char *format, ...)
@@ -188,13 +181,12 @@ void Uart::printf(const char *format, ...)
 	va_start(args, format);
 	vsnprintf(uart_buffer, 128, format, args);
 	va_end(args);
-	//Uart::put_str(uart_buffer);
 	Uart::put_s(uart_buffer);
 }
 
 Uart& Uart::operator<<(const char* msg)
 {
-	Uart::put_str(msg);
+	Uart::put_s(msg);
 	return *this;
 }
 
@@ -209,6 +201,6 @@ Uart& Uart::operator <<(const double num)
 	char f_val[10];
 	
 	dtostrf(num, 3, 3, f_val);
-	Uart::printf(f_val);
+	Uart::put_s(f_val);
 	return *this;
 }

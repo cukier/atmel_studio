@@ -25,7 +25,6 @@ extern "C"
 		static bool done(void);
 		static void get(uint8_t *data, uint16_t len);
 		static void put_char(uint8_t data);
-		static void put_str(const char *str);
 		static void send(uint8_t *data, uint16_t len);
 		static void put_s(const char *s);
 		static void printf(const char *format, ...);
