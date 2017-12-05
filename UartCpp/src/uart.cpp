@@ -5,6 +5,8 @@
 #include <avr/interrupt.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
 #define UART_RX0_BUFFER_MASK (UART_RX0_BUFFER_SIZE - 1)
 #define UART_TX0_BUFFER_MASK (UART_TX0_BUFFER_SIZE - 1)
@@ -85,9 +87,9 @@ void Uart::flush()
 {
 	ATOMIC_BLOCK(ATOMIC_FORCEON)
 	{
-		//UART_RxHead = UART_RxTail;
-		UART_RxHead = UART_RxTail = 0;
-		UART_TxHead = UART_TxTail = 0;
+		UART_RxHead = UART_RxTail;
+		//UART_RxHead = UART_RxTail = 0;
+		//UART_TxHead = UART_TxTail = 0;
 	}
 }
 
@@ -141,6 +143,21 @@ void Uart::put_char(uint8_t data)
 	UCSR0B |= (1<<UDRIE0);
 }
 
+void Uart::put_str(const char *str)
+{
+	uint16_t tmphead;
+	
+	while (*str)
+	{
+		tmphead = (UART_TxHead + 1) & UART_TX0_BUFFER_MASK;
+		while (tmphead == UART_TxTail);
+		UART_TxBuf[tmphead] = *str++;
+		UART_TxHead = tmphead;
+	}
+	
+	UCSR0B |= (1<<UDRIE0);
+}
+
 void Uart::send(uint8_t *data, uint16_t len)
 {
 	uint16_t tmphead, i;
@@ -163,7 +180,7 @@ void Uart::put_s(const char *s)
 	}
 }
 
-void Uart::printf(char *format, ...)
+void Uart::printf(const char *format, ...)
 {
 	char uart_buffer[128];
 	va_list args;
@@ -171,21 +188,27 @@ void Uart::printf(char *format, ...)
 	va_start(args, format);
 	vsnprintf(uart_buffer, 128, format, args);
 	va_end(args);
+	//Uart::put_str(uart_buffer);
 	Uart::put_s(uart_buffer);
 }
 
 Uart& Uart::operator<<(const char* msg)
 {
-	while (*msg) {
-		Uart::put_char(*msg++);
-	}
-	
+	Uart::put_str(msg);
 	return *this;
 }
 
-template<typename T>
-Uart& Uart::operator<<(const T num)
+Uart& Uart::operator<<(const int num)
 {
 	Uart::printf("%d", num);
+	return *this;
+}
+
+Uart& Uart::operator <<(const double num)
+{
+	char f_val[10];
+	
+	dtostrf(num, 3, 3, f_val);
+	Uart::printf(f_val);
 	return *this;
 }
