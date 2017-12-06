@@ -3,7 +3,7 @@
   (general
     (links 96)
     (no_connects 0)
-    (area 19.924999 14.924999 86.075001 92.075001)
+    (area 19.6244 13.2788 86.075001 93.6196)
     (thickness 1.6)
     (drawings 4)
     (tracks 340)
@@ -13,6 +13,15 @@
   )
 
   (page A4)
+  (title_block
+    (title ReleModbus)
+    (date 2017-12-06)
+    (rev 0)
+    (comment 2 mauriciocukier@gmail.com)
+    (comment 3 "Engenheiro Eletrico")
+    (comment 4 "Mauricio Cukier")
+  )
+
   (layers
     (0 F.Cu signal)
     (31 B.Cu signal)
@@ -64,7 +73,7 @@
     (aux_axis_origin 0 0)
     (visible_elements 7FFFFFFF)
     (pcbplotparams
-      (layerselection 0x00030_80000001)
+      (layerselection 0x010f0_80000001)
       (usegerberextensions false)
       (excludeedgelayer true)
       (linewidth 0.100000)
@@ -79,15 +88,15 @@
       (psnegative false)
       (psa4output false)
       (plotreference true)
-      (plotvalue true)
+      (plotvalue false)
       (plotinvisibletext false)
       (padsonsilk false)
       (subtractmaskfromsilk false)
-      (outputformat 1)
+      (outputformat 4)
       (mirror false)
-      (drillshape 1)
+      (drillshape 0)
       (scaleselection 1)
-      (outputdirectory ""))
+      (outputdirectory pdf))
   )
 
   (net 0 "")

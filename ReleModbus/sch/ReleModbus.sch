@@ -1,4 +1,5 @@
 EESchema Schematic File Version 2
+LIBS:ReleModbus-rescue
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -35,17 +36,17 @@ EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
 Sheet 1 1
-Title ""
-Date ""
-Rev ""
+Title "ReleModbus"
+Date "2017-12-06"
+Rev "0"
 Comp ""
 Comment1 ""
-Comment2 ""
-Comment3 ""
-Comment4 ""
+Comment2 "mauriciocukier@gmail.com"
+Comment3 "Engenheiro Eletrico"
+Comment4 "Mauricio Cukier"
 $EndDescr
 $Comp
-L D_ALT D1
+L D_ALT-RESCUE-ReleModbus D1
 U 1 1 5A27DCAF
 P 2050 950
 F 0 "D1" H 2050 1050 50  0000 C CNN
@@ -706,7 +707,7 @@ SDA
 Text Label 2400 1900 2    60   ~ 0
 SCL
 $Comp
-L D_ALT D2
+L D_ALT-RESCUE-ReleModbus D2
 U 1 1 5A2920A2
 P 6700 1350
 F 0 "D2" H 6700 1450 50  0000 C CNN
@@ -818,7 +819,7 @@ $EndComp
 Wire Wire Line
 	6150 2700 6150 2600
 $Comp
-L D_ALT D3
+L D_ALT-RESCUE-ReleModbus D3
 U 1 1 5A294797
 P 6700 3000
 F 0 "D3" H 6700 3100 50  0000 C CNN
