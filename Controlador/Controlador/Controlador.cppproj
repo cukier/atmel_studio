@@ -12,9 +12,9 @@
     <OutputFileName>$(MSBuildProjectName)</OutputFileName>
     <OutputFileExtension>.elf</OutputFileExtension>
     <OutputDirectory>$(MSBuildProjectDirectory)\$(Configuration)</OutputDirectory>
-    <AssemblyName>ControladorCpp</AssemblyName>
-    <Name>ControladorCpp</Name>
-    <RootNamespace>ControladorCpp</RootNamespace>
+    <AssemblyName>Controlador</AssemblyName>
+    <Name>Controlador</Name>
+    <RootNamespace>Controlador</RootNamespace>
     <ToolchainFlavour>Native</ToolchainFlavour>
     <KeepTimersRunning>true</KeepTimersRunning>
     <OverrideVtor>false</OverrideVtor>
@@ -179,6 +179,12 @@
       <SubType>compile</SubType>
       <Link>uart.h</Link>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\sim\Controlador.DSN">
+      <SubType>compile</SubType>
+      <Link>Controlador.DSN</Link>
+    </None>
   </ItemGroup>
   <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
 </Project>

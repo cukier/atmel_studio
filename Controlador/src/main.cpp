@@ -22,7 +22,7 @@ int main(void)
 	
 	while (1)
 	{
-		uart.put_s("Hello\n");
+		uart << "Estado : " << plc.get_estado() << "\n\r";
 		plc.teste_saidas();
 		_delay_ms(2000);
 	}

@@ -52,17 +52,26 @@
 #define make8(v, o)						((uint8_t) (((v >> (o * 8)) & 0xff)))
 #define swap(v)							((v << 8) | (v >> 8))
 
-#define F_CPU							16000000ULL
+#define F_CPU							4000000ULL
 #define BAUD							9600
-
+//SIADAS
 #define Q0								B,0
 #define Q1								B,1
 #define Q2								B,2
 #define Q3								B,3
+#define Q4								B,4
+#define Q5								B,5
+#define Q6								B,6
+#define Q7								B,7
+//ENTRADAS
 #define I0								D,2
 #define I1								D,3
 #define I2								D,4
 #define I3								D,5
+#define I4								D,6
+#define I5								D,7
+#define I6								C,0
+#define I7								C,1
 
 #ifdef __DEBUG
 void debug_msg(const char *str, ...);
