@@ -11,22 +11,25 @@
 #define UART_RX0_BUFFER_MASK (UART_RX0_BUFFER_SIZE - 1)
 #define UART_TX0_BUFFER_MASK (UART_TX0_BUFFER_SIZE - 1)
 
-static volatile uint16_t UART_TxHead;
-static volatile uint16_t UART_TxTail;
-static volatile uint16_t UART_RxHead;
-static volatile uint16_t UART_RxTail;
-static volatile uint8_t UART_TxBuf[UART_TX0_BUFFER_SIZE];
-static volatile uint8_t UART_RxBuf[UART_RX0_BUFFER_SIZE];
+namespace _Uart
+{
+	static volatile uint16_t TxHead;
+	static volatile uint16_t TxTail;
+	static volatile uint16_t RxHead;
+	static volatile uint16_t RxTail;
+	static volatile uint8_t TxBuf[UART_TX0_BUFFER_SIZE];
+	static volatile uint8_t RxBuf[UART_RX0_BUFFER_SIZE];
+}
 
 ISR(USART_UDRE_vect)
 {
 	uint16_t tmptail;
 	
-	if (UART_TxHead != UART_TxTail)
+	if (_Uart::TxHead != _Uart::TxTail)
 	{
-		tmptail = (UART_TxTail + 1) & UART_TX0_BUFFER_MASK;
-		UART_TxTail = tmptail;
-		UDR0 = UART_TxBuf[tmptail];
+		tmptail = (_Uart::TxTail + 1) & UART_TX0_BUFFER_MASK;
+		_Uart::TxTail = tmptail;
+		UDR0 = _Uart::TxBuf[tmptail];
 	}
 	else
 	{
@@ -38,23 +41,23 @@ ISR(USART_RX_vect)
 {
 	uint16_t tmphead;
 	
-	tmphead = (UART_RxHead + 1) & UART_RX0_BUFFER_MASK;
+	tmphead = (_Uart::RxHead + 1) & UART_RX0_BUFFER_MASK;
 	
-	if (tmphead != UART_RxTail)
+	if (tmphead != _Uart::RxTail)
 	{
-		UART_RxHead = tmphead;
-		UART_RxBuf[tmphead] = UDR0;
+		_Uart::RxHead = tmphead;
+		_Uart::RxBuf[tmphead] = UDR0;
 	}
 }
 
 void Uart::init(uint16_t baudrate)
-{
+{	
 	ATOMIC_BLOCK(ATOMIC_FORCEON)
 	{
-		UART_TxHead = 0;
-		UART_TxTail = 0;
-		UART_RxHead = 0;
-		UART_RxTail = 0;
+		_Uart::TxHead = 0;
+		_Uart::TxTail = 0;
+		_Uart::RxHead = 0;
+		_Uart::RxTail = 0;
 	}
 	
 	if (baudrate & 0x8000)
@@ -77,7 +80,7 @@ uint16_t Uart::available()
 	
 	ATOMIC_BLOCK(ATOMIC_FORCEON)
 	{
-		ret = (UART_RX0_BUFFER_SIZE + UART_RxHead - UART_RxTail) & UART_RX0_BUFFER_MASK;
+		ret = (UART_RX0_BUFFER_SIZE + _Uart::RxHead - _Uart::RxTail) & UART_RX0_BUFFER_MASK;
 	}
 	
 	return ret;
@@ -87,9 +90,9 @@ void Uart::flush()
 {
 	ATOMIC_BLOCK(ATOMIC_FORCEON)
 	{
-		UART_RxHead = UART_RxTail;
-		//UART_RxHead = UART_RxTail = 0;
-		//UART_TxHead = UART_TxTail = 0;
+		//_Uart::UART_RxHead = _Uart::UART_RxTail;
+		_Uart::RxHead = _Uart::RxTail = 0;
+		_Uart::TxHead = _Uart::TxTail = 0;
 	}
 }
 
@@ -98,28 +101,28 @@ bool Uart::done()
 	bool ret = false;
 
 	ATOMIC_BLOCK(ATOMIC_FORCEON) {
-		ret = (UART_TxHead == UART_TxTail);
+		ret = (_Uart::TxHead == _Uart::TxTail);
 	}
 	
 	return ret;
 }
 
-uint8_t uart_getc(void)
+uint8_t Uart::get_c(void)
 {
 	uint16_t tmptail;
 	
 	ATOMIC_BLOCK(ATOMIC_FORCEON)
 	{
-		if (UART_RxHead == UART_RxTail)
+		if (_Uart::RxHead == _Uart::RxTail)
 		{
 			return 0xFF;
 		}
 	}
 	
-	tmptail = (UART_RxTail + 1) & UART_RX0_BUFFER_MASK;
-	UART_RxTail = tmptail;
+	tmptail = (_Uart::RxTail + 1) & UART_RX0_BUFFER_MASK;
+	_Uart::RxTail = tmptail;
 	
-	return UART_RxBuf[tmptail];
+	return _Uart::RxBuf[tmptail];
 }
 
 void Uart::get(uint8_t *data, uint16_t len)
@@ -128,7 +131,7 @@ void Uart::get(uint8_t *data, uint16_t len)
 	
 	for (i = 0; i < len; ++i)
 	{
-		data[i] = uart_getc();
+		data[i] = Uart::get_c();
 	}
 }
 
@@ -136,10 +139,10 @@ void Uart::put_char(uint8_t data)
 {
 	uint16_t tmphead;
 	
-	tmphead = (UART_TxHead + 1) & UART_TX0_BUFFER_MASK;
-	while (tmphead == UART_TxTail);
-	UART_TxBuf[tmphead] = data;
-	UART_TxHead = tmphead;
+	tmphead = (_Uart::TxHead + 1) & UART_TX0_BUFFER_MASK;
+	while (tmphead == _Uart::TxTail);
+	_Uart::TxBuf[tmphead] = data;
+	_Uart::TxHead = tmphead;
 	UCSR0B |= (1<<UDRIE0);
 }
 
@@ -149,10 +152,10 @@ void Uart::send(uint8_t *data, uint16_t len)
 	
 	for (i = 0; i < len; ++i)
 	{
-		tmphead = (UART_TxHead + 1) & UART_TX0_BUFFER_MASK;
-		while (tmphead == UART_TxTail);
-		UART_TxBuf[tmphead] = data[i];
-		UART_TxHead = tmphead;
+		tmphead = (_Uart::TxHead + 1) & UART_TX0_BUFFER_MASK;
+		while (tmphead == _Uart::TxTail);
+		_Uart::TxBuf[tmphead] = data[i];
+		_Uart::TxHead = tmphead;
 	}
 	
 	UCSR0B |= (1<<UDRIE0);
@@ -164,10 +167,10 @@ void Uart::put_s(const char *s)
 	
 	while (*s)
 	{
-		tmphead = (UART_TxHead + 1) & UART_TX0_BUFFER_MASK;
-		while (tmphead == UART_TxTail);
-		UART_TxBuf[tmphead] = *s++;
-		UART_TxHead = tmphead;
+		tmphead = (_Uart::TxHead + 1) & UART_TX0_BUFFER_MASK;
+		while (tmphead == _Uart::TxTail);
+		_Uart::TxBuf[tmphead] = *s++;
+		_Uart::TxHead = tmphead;
 	}
 	
 	UCSR0B |= (1<<UDRIE0);
@@ -184,17 +187,24 @@ void Uart::printf(const char *format, ...)
 	Uart::put_s(uart_buffer);
 }
 
-Uart& Uart::operator<<(const char* msg)
+Uart& Uart::operator <<(const char* msg)
 {
 	Uart::put_s(msg);
 	return *this;
 }
 
-Uart& Uart::operator<<(const int num)
+Uart& Uart::operator <<(const int num)
 {
 	Uart::printf("%d", num);
 	return *this;
 }
+
+Uart& Uart::operator <<(const unsigned int num)
+{
+	Uart::printf("%u", num);
+	return *this;
+}
+
 
 Uart& Uart::operator <<(const double num)
 {
@@ -202,5 +212,33 @@ Uart& Uart::operator <<(const double num)
 	
 	dtostrf(num, 3, 3, f_val);
 	Uart::put_s(f_val);
+	return *this;
+}
+
+Uart& Uart::operator >>(char *msg)
+{
+	while(Uart::available())
+	{
+		*msg++ = Uart::get_c();
+	}
+	
+	return *this;
+}
+
+Uart& Uart::operator >>(unsigned int num)
+{
+	num = Uart::get_c();
+		
+	return *this;
+}
+
+
+Uart& Uart::operator >>(unsigned int *buf)
+{
+	while(Uart::available())
+	{
+		*buf++ = Uart::get_c();
+	}
+	
 	return *this;
 }

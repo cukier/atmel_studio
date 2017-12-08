@@ -17,10 +17,18 @@ IO::IO()
 	SET_OUTPUT(Q1);
 	SET_OUTPUT(Q2);
 	SET_OUTPUT(Q3);
+	SET_OUTPUT(Q4);
+	SET_OUTPUT(Q5);
+	SET_OUTPUT(Q6);
+	SET_OUTPUT(Q7);
 	SET(Q0);
 	SET(Q1);
 	SET(Q2);
 	SET(Q3);
+	SET(Q4);
+	SET(Q5);
+	SET(Q6);
+	SET(Q7);
 	this->m_estado = 0;
 } //IO
 
@@ -30,6 +38,10 @@ void IO::clear_all(void)
 	SET(Q1);
 	SET(Q2);
 	SET(Q3);
+	SET(Q4);
+	SET(Q5);
+	SET(Q6);
+	SET(Q7);
 }
 
 uint8_t IO::get_estado(void)
@@ -126,7 +138,7 @@ bool IO::get_saida(enum SAIDAS saida)
 }
 
 void IO::set_saida(enum SAIDAS saida, bool val)
-{	
+{
 	switch(saida)
 	{
 		case IO_I0:
@@ -252,6 +264,26 @@ void IO::teste_saidas(void)
 		case 4:
 		this->clear_all();
 		RESET(Q3);
+		break;
+		
+		case 5:
+		this->clear_all();
+		RESET(Q4);
+		break;
+		
+		case 6:
+		this->clear_all();
+		RESET(Q5);
+		break;
+		
+		case 7:
+		this->clear_all();
+		RESET(Q6);
+		break;
+		
+		case 8:
+		this->clear_all();
+		RESET(Q7);
 		break;
 	}
 }
