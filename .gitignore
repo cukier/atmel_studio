@@ -75,3 +75,5 @@ $RECYCLE.BIN/
 *.dmp
 
 *.kicad_pcb-bak
+*.bak
+*.net
