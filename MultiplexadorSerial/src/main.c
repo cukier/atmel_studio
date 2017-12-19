@@ -39,16 +39,10 @@ void timer_1_stop(void)
 
 void m_init(void)
 {
-	#ifdef _LOW_SPEED_BAUD
+	//uart_init(UART_BAUD_SELECT_DOUBLE_SPEED(BAUD, F_CPU));
 	uart_init(UART_BAUD_SELECT(BAUD, F_CPU));
-	#endif
-	
-	#ifdef _HIGH_SPEED_BAUD
-	uart_init(UART_BAUD_SELECT_DOUBLE_SPEED(BAUD, F_CPU));
-	#endif
-	
 	terminais_init();
-	timer_1_start();
+	//timer_1_start();
 	//led_init();
 	SET_OUTPUT(LED);
 	sei();
@@ -238,10 +232,10 @@ void fun6(void)
 		{
 			while(--n)
 			{
-				uart_printf("r: %u %u ", n, uart_getc());
+				uart_printf("r: %u %c ", n, uart_getc());
 			}
 			
-			uart_printf("\n\r");
+			uart_printf("r: %u %c\n\r", n, uart_getc());
 		}
 		
 		while(!uart_done());
@@ -443,7 +437,7 @@ void fun10(void)
 
 int main(void)
 {
-	fun10();
+	fun6();
 	
 	return 0;
 }

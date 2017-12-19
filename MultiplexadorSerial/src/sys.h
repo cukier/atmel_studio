@@ -10,14 +10,6 @@
 
 #include <avr/io.h>
 
-#if !(_SLOW_XTAL) && ! (_FAST_XTAL)
-#error "Definir cristal "_SLOW_XTAL" ou "_FAST_XTAL""
-#endif
-
-#if !(_HIGH_SPEED_BAUD) && ! (_LOW_SPEED_BAUD)
-#error "Definir baud "_HIGH_SPEED_BAUD" (115200) ou "_LOW_SPEED_BAUD" (9600)"
-#endif
-
 #define	PORT(x)							_port2(x)
 #define	DDR(x)							_ddr2(x)
 #define	PIN(x)							_pin2(x)
@@ -60,27 +52,15 @@
 #define make8(v, o)						((uint8_t) (((v >> (o * 8)) & 0xff)))
 #define swap(v)							((v << 8) | (v >> 8))
 
-#ifdef _SLOW_XTAL
-#define F_CPU							4000000ULL
-#endif
-
-#ifdef _FAST_XTAL
 #define F_CPU							16000000ULL
-#endif
-
-#ifdef _HIGH_SPEED_BAUD
-#define BAUD							19200
-#endif
-
-#ifdef _LOW_SPEED_BAUD
 #define BAUD							9600
-#endif
+
 
 #define BUFFER_SIZE		32
 #define LEITURAS		1000
 #define ADR_T1			C,0
-#define ADR_T2			C,1
-#define LED				B,5
+#define ADR_T2			C,2
+#define LED				C,1
 #define LED_1			B,0
 #define LED_2			B,1
 
