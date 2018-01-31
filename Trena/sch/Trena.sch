@@ -28,14 +28,15 @@ LIBS:opto
 LIBS:atmel
 LIBS:contrib
 LIBS:valves
+LIBS:Trena-cache
 EELAYER 25 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
 Sheet 1 1
 Title "Trena Serial"
-Date "2017-12-19"
-Rev "0"
+Date "2018-01-31"
+Rev "1"
 Comp ""
 Comment1 "Mauricio Cukier"
 Comment2 "mauricio@gmail.com"
@@ -717,7 +718,7 @@ $EndComp
 Wire Wire Line
 	7950 2800 7950 2750
 Wire Wire Line
-	7450 2800 7950 2800
+	7450 2800 8200 2800
 Wire Wire Line
 	7700 2800 7700 2850
 $Comp
@@ -1358,10 +1359,10 @@ A
 Text Label 10150 2300 1    60   ~ 0
 B
 $Comp
-L GND #PWR40
+L GND #PWR42
 U 1 1 5A3EA008
 P 9750 2100
-F 0 "#PWR40" H 9750 1850 50  0001 C CNN
+F 0 "#PWR42" H 9750 1850 50  0001 C CNN
 F 1 "GND" H 9750 1950 50  0000 C CNN
 F 2 "" H 9750 2100 50  0001 C CNN
 F 3 "" H 9750 2100 50  0001 C CNN
@@ -1432,4 +1433,56 @@ F 3 "" H 6500 800 50  0001 C CNN
 $EndComp
 Wire Wire Line
 	6500 800  6500 900 
+$Comp
+L CONN_01X04 J6
+U 1 1 5A71B6EF
+P 9600 2800
+F 0 "J6" H 9600 3050 50  0000 C CNN
+F 1 "HC-SR04" V 9700 2800 50  0000 C CNN
+F 2 "w_pin_strip:pin_socket_4" H 9600 2800 50  0001 C CNN
+F 3 "" H 9600 2800 50  0001 C CNN
+	1    9600 2800
+	1    0    0    -1  
+$EndComp
+$Comp
+L +5V #PWR40
+U 1 1 5A71BA6C
+P 9300 2600
+F 0 "#PWR40" H 9300 2450 50  0001 C CNN
+F 1 "+5V" H 9300 2740 50  0000 C CNN
+F 2 "" H 9300 2600 50  0001 C CNN
+F 3 "" H 9300 2600 50  0001 C CNN
+	1    9300 2600
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	9300 2600 9300 2650
+Wire Wire Line
+	9300 2650 9400 2650
+Wire Wire Line
+	9400 2750 8350 2750
+Wire Wire Line
+	8350 2750 8350 1900
+Connection ~ 8350 1900
+Wire Wire Line
+	8200 2800 8200 2850
+Wire Wire Line
+	8200 2850 9400 2850
+Connection ~ 7950 2800
+$Comp
+L GND #PWR41
+U 1 1 5A71BE32
+P 9300 3050
+F 0 "#PWR41" H 9300 2800 50  0001 C CNN
+F 1 "GND" H 9300 2900 50  0000 C CNN
+F 2 "" H 9300 3050 50  0001 C CNN
+F 3 "" H 9300 3050 50  0001 C CNN
+	1    9300 3050
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	9300 3050 9300 2950
+Wire Wire Line
+	9300 2950 9400 2950
+NoConn ~ 10650 1200
 $EndSCHEMATC
