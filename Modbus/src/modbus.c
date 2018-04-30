@@ -7,8 +7,6 @@
 
 #include "modbus.h"
 #include "uart.h"
-#include "i2c.h"
-#include "eeprom.h"
 #include "mem.h"
 
 #include <stdlib.h>
@@ -117,6 +115,16 @@ static volatile uint16_t m_address_1;
 static volatile uint16_t m_address_2;
 static volatile bool modbus_err;
 
+bool modbus_get_err(void);
+uint16_t CRC16(uint8_t *nData, uint16_t wLength);
+bool modbus_send(uint8_t *data, uint16_t i_size);
+uint8_t check_CRC(uint8_t *resp, modbus_command_t command);
+bool return_error(modbus_command_t command, modbus_command_exception_code_t error);
+uint8_t l_byte(uint16_t m_word);
+uint8_t h_byte(uint16_t m_word);
+void make_read_request(uint8_t addr, uint16_t s_addr, uint16_t nb, uint8_t *request);
+void make_write_request(uint8_t addr, uint16_t s_addr, uint16_t value, uint8_t *request);
+
 bool modbus_get_err(void)
 {
 	return modbus_err;
@@ -127,7 +135,7 @@ bool modbus_init(uint16_t add1, uint16_t add2)
 #else
 bool modbus_init(uint16_t add1)
 #endif
-{	
+{
 	uart_init(UART_BAUD_SELECT_DOUBLE_SPEED(BAUD, F_CPU));
 	
 	#ifdef USART1_ENABLED
