@@ -67,12 +67,15 @@ int main(void)
 		_delay_ms(1);
 		#endif
 		
-		if (modbus_slave())
-		{
-			RESET(LED);
-			_delay_ms(5);
-			SET(LED);
-		}
+		//if (modbus_slave())
+		//{
+			//RESET(LED);
+			//_delay_ms(5);
+			//SET(LED);
+		//}
+		
+		modbus_get_register(1, 1);
+		_delay_ms(500);
 	}
 	
 	return 0;

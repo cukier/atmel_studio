@@ -144,15 +144,20 @@ void uart_send(uint8_t *data, uint16_t len)
 {
 	uint16_t tmphead, i;
 	
-	for (i = 0; i < len; ++i)
+	ATOMIC_BLOCK(ATOMIC_FORCEON)
 	{
-		tmphead = (UART_TxHead + 1) & UART_TX0_BUFFER_MASK;
-		while (tmphead == UART_TxTail);
-		UART_TxBuf[tmphead] = data[i];
-		UART_TxHead = tmphead;
+		for (i = 0; i < len; ++i)
+		{
+			tmphead = (UART_TxHead + 1) & UART_TX0_BUFFER_MASK;
+			while (tmphead == UART_TxTail);
+			UART_TxBuf[tmphead] = data[i];
+			UART_TxHead = tmphead;
+		}
 	}
 	
 	UCSR0B |= (1<<UDRIE0);
+	
+	while(UART_TxHead != UART_TxTail);
 }
 
 void uart_puts(const char *s)
