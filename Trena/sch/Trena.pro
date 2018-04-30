@@ -1,4 +1,4 @@
-update=02/03/2018 07:57:28
+update=Dom 18 Fev 2018 20:30:34 -03
 version=1
 last_client=kicad
 [pcbnew]
@@ -33,8 +33,6 @@ NetFmtName=Pcbnew
 SpiceForceRefPrefix=0
 SpiceUseNetNumbers=0
 LabSize=60
-[general]
-version=1
 [eeschema]
 version=1
 LibDir=
@@ -69,3 +67,7 @@ LibName27=opto
 LibName28=atmel
 LibName29=contrib
 LibName30=valves
+LibName31=/home/cuki/workspace/atmel_studio/Trena/doc/powerint
+LibName32=/home/cuki/workspace/kicad-library/library/Transformer
+[general]
+version=1
