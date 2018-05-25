@@ -3,28 +3,38 @@
 
 #include <stdbool.h>
 
-#define RELE B,0
+#define RELE		B,0
+#define TIMER_STEP	10
 
 static volatile bool m_ligado = false;
-static volatile uint16_t m_periodo = 20000;
+static volatile uint16_t m_periodo = 200;
 static volatile uint16_t m_duty = 50;
-static volatile uint16_t tempo_ligado = 10000;
-static volatile uint16_t tempo_desligado = 10000;
+static volatile uint16_t tempo_ligado = 100;
+static volatile uint16_t tempo_desligado = 100;
+static volatile uint16_t m_tick = 0;
 
 void run(void)
 {
 	if (m_ligado)
 	{
-		m_ligado = false;
-		RESET(RELE);
-		timer_1_init(tempo_desligado, F_CPU);
+		if (m_tick == tempo_ligado)
+		{
+			m_tick = 0;
+			m_ligado = false;
+			RESET(RELE);
+		}
 	}
 	else
 	{
-		m_ligado = true;
-		SET(RELE);
-		timer_1_init(tempo_ligado, F_CPU);
+		if (m_tick == tempo_desligado)
+		{
+			m_tick = 0;
+			m_ligado = true;
+			SET(RELE);
+		}
 	}
+	
+	++m_tick;
 }
 
 void calculate_timer(void)
@@ -36,7 +46,7 @@ void calculate_timer(void)
 	
 	if (m_periodo == 0)
 	{
-		m_periodo = 20;
+		m_periodo = 2000;
 	}
 	
 	tempo_ligado = (uint16_t) ((float) m_duty / 100 * m_periodo);
@@ -47,10 +57,13 @@ void calculate_timer(void)
 	}
 	
 	tempo_desligado = m_periodo - tempo_ligado;
+	m_tick = 0;
 }
 
 void percentimetro_init(void)
 {
+	m_tick = 0;
+	
 	SET_OUTPUT(RELE);
 	
 	timer_1_setCallBack(&run);
@@ -59,13 +72,13 @@ void percentimetro_init(void)
 
 void percentimetro_set_periodo(uint16_t periodo)
 {
-	if (periodo > 1000)
+	if (periodo != 0 && periodo <= 2000)
 	{
 		m_periodo = periodo;
 	}
 	else
 	{
-		m_periodo = 20000;
+		m_periodo = 2000;
 	}
 	
 	calculate_timer();
@@ -79,7 +92,7 @@ void percentimetro_set_duty(uint16_t duty)
 	}
 	else
 	{
-		m_duty = duty;	
+		m_duty = duty;
 	}
 	
 	calculate_timer();
@@ -88,13 +101,15 @@ void percentimetro_set_duty(uint16_t duty)
 void percentimetro_start(void)
 {
 	m_ligado = true;
+	m_tick = 0;
 	SET(RELE);
-	timer_1_init(tempo_ligado, F_CPU);
+	timer_1_init(TIMER_STEP, F_CPU);
 }
 
 void percentimetro_stop(void)
 {
 	m_ligado = false;
+	m_tick = 0;
 	RESET(RELE);
 	timer_1_stop();
 }

@@ -48,9 +48,9 @@ int main(void)
 			}
 			else if(comando == 1)
 			{
-				if (periodo == 0 || periodo > 20000)
+				if (periodo == 0 || periodo > 2000)
 				{
-					periodo = 20000;
+					periodo = 2000;
 				}
 				
 				if (porcent == 0 || porcent > 100)
