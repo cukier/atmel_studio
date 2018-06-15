@@ -14,11 +14,11 @@ int main(void)
 {
 	//uint16_t cont = 0;
 	
-	DDRC |= _BV(DDC1);
+	DDRB |= _BV(DDB0);
     
     while (1) 
     {
-		PORTC ^= _BV(PORTC1);
+		PORTB ^= _BV(PORTB0);
 		_delay_ms(100);
 		//if (cont < 1600)
 		//{
