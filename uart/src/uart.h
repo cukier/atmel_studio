@@ -26,7 +26,7 @@ extern uint16_t uart_available(void);
 extern void uart_flush(void);
 extern bool uart_done(void);
 extern uint8_t uart_getc(void);
-extern void uart_get(uint8_t *data, uint16_t len);
+extern void uart_get(char *data, uint16_t len);
 extern void uart_putc(uint8_t data);
 extern void uart_send(uint8_t *data, uint16_t len);
 extern void uart_puts(const char *s);

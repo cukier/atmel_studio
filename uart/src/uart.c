@@ -120,7 +120,7 @@ uint8_t uart_getc(void)
 	return UART_RxBuf[tmptail];
 }
 
-void uart_get(uint8_t *data, uint16_t len)
+void uart_get(char *data, uint16_t len)
 {
 	uint16_t i;
 	

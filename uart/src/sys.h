@@ -50,7 +50,7 @@
 #define make8(v, o)						((uint8_t) (((v >> (o * 8)) & 0xff)))
 #define swap(v)							((v << 8) | (v >> 8))
 
-#define F_CPU							4000000ULL
+#define F_CPU							16000000ULL
 #define BAUD							9600
 
 #ifdef __DEBUG
