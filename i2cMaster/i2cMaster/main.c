@@ -16,7 +16,7 @@
 
 #define F_SCL 100000UL // SCL frequency
 #define Prescaler 1
-#define TWBR_val ((((F_CPU / F_SCL) / Prescaler) - 16 ) / 2)
+#define TWBR_val ((((F_CPU / F_SCL) / Prescaler) - 16) / 2)
 #define I2C_READ 0x01
 #define I2C_WRITE 0x00
 

@@ -120,8 +120,29 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="main.c">
+    <Compile Include="..\src\i2cSlave.c">
       <SubType>compile</SubType>
+      <Link>i2cSlave.c</Link>
+    </Compile>
+    <Compile Include="..\src\i2cSlave.h">
+      <SubType>compile</SubType>
+      <Link>i2cSlave.h</Link>
+    </Compile>
+    <Compile Include="..\src\main.c">
+      <SubType>compile</SubType>
+      <Link>main.c</Link>
+    </Compile>
+    <Compile Include="..\src\sys.h">
+      <SubType>compile</SubType>
+      <Link>sys.h</Link>
+    </Compile>
+    <Compile Include="..\src\uart.c">
+      <SubType>compile</SubType>
+      <Link>uart.c</Link>
+    </Compile>
+    <Compile Include="..\src\uart.h">
+      <SubType>compile</SubType>
+      <Link>uart.h</Link>
     </Compile>
   </ItemGroup>
   <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />

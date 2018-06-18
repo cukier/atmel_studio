@@ -1,30 +1,28 @@
-/*
-* i2cSlave.c
-*
-* Created: 18/06/2018 16:12:33
-* Author : Mouses
-* https://github.com/g4lvanix/I2C-slave-lib
-*/
-
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <util/twi.h>
 
 #include <stdint.h>
 
-//#define F_CPU	16000000ULL
-//#include <util/delay.h>
+static void (*i2c_recv)(uint8_t);
 
 volatile uint8_t buffer_address;
 volatile uint8_t txbuffer[0xFF];
 volatile uint8_t rxbuffer[0xFF];
 
-void i2c_init(uint8_t slv_addr) {
+void i2c_setCallback(void (*recv)(uint8_t))
+{
+	i2c_recv = recv;
+}
+
+void i2c_init(uint8_t slv_addr)
+{
 	TWAR = (slv_addr << 1);
 	TWCR = _BV(TWIE) | _BV(TWEA) | _BV(TWINT) | _BV(TWEN);
 }
 
-void i2c_stop() {
+void i2c_stop()
+{
 	TWCR &= ~(_BV(TWEA) | _BV(TWEN));
 }
 
@@ -39,6 +37,7 @@ ISR(TWI_vect) {
 	else if((TWSR & 0xF8) == TW_SR_DATA_ACK)
 	{
 		data = TWDR;
+		i2c_recv(data);
 		
 		if(buffer_address == 0xFF)
 		{
@@ -79,22 +78,4 @@ ISR(TWI_vect) {
 	{
 		TWCR |= _BV(TWIE) | _BV(TWEA) | _BV(TWEN);
 	}
-	
-	PORTB ^= _BV(PORTB0);
-}
-
-int main(void)
-{
-	DDRB |= _BV(DDB0);
-	PORTB |= _BV(DDB0);
-	i2c_init(0x10);
-	sei();
-	
-	while (1)
-	{
-		//PORTB ^= _BV(PORTB0);
-		//_delay_ms(1000);
-	}
-	
-	return 0;
 }
