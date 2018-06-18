@@ -31,7 +31,6 @@ int main(void)
 			uart_get(str, n);
 			str[n] = '\0';
 			uart_printf(str);
-			str[0] = '\n';
 		}
 		
 		_delay_ms(500);

@@ -1,38 +1,80 @@
 /*
- * i2c.c
- *
- * Created: 03/04/2017 12:57:44
- * Author : cuki
- *
- * http://www.embedds.com/programming-avr-i2c-interface/
- */ 
+* i2c.c
+*
+* Created: 03/04/2017 12:57:44
+* Author : cuki
+*
+* http://www.embedds.com/programming-avr-i2c-interface/
+*
+* https://github.com/thegouger/avr-i2c-slave
+*/
 
-#include <avr/io.h>
-#include <avr/pgmspace.h>
+#include "sys.h"
 #include "i2c.h"
-#define F_CPU 8000000UL
-#include <util/delay.h>
+#include "uart.h"
 
-#define  EEMAXADDR 23
+#include <util/delay.h>
+#include <avr/interrupt.h>
+
+#ifdef I2C_MASTER
+//#include <avr/interrupt.h>
+#endif
+
+#ifdef I2C_SLAVE
+#include <stdbool.h>
+
+bool printOk;
+uint8_t varRec;
+
+void recOk(uint8_t var) {
+	printOk = true;
+	varRec = var;
+}
+
+void reqOk(void) {
+	
+}
+#endif
 
 int main(void)
 {
-	uint16_t u16eaddress = 0x10;
-	uint8_t u8ebyte = 0x45, u8erbyte = 0;
-	
+	#ifdef I2C_MASTER
 	TWIInit();
+	TWISetAddress(0x10);
+	TWISetWordAddress();
+	#endif
+	
+	#ifdef I2C_SLAVE
+	I2C_setCallbacks(recOk, reqOk);
+	I2C_init(0x10);
+	#endif
+	
+	uart_init(UART_BAUD_SELECT(BAUD, F_CPU));
 	DDRB |= (1 << DDB0);
+	
+	sei();
 	
 	while(1)
 	{
-		EEWriteByte(u16eaddress, u8ebyte);
-		
-		if (EEReadByte(u16eaddress, &u8erbyte) != ERROR)
-		{
-			if (u8ebyte == u8erbyte);
-		}
-		
+		#ifdef I2C_MASTER
+		uart_printf("Teste Mestre\n");
+		TWIWriteByte(0x00, 0x44);
 		PORTB ^= (1 << PORTB0);
 		_delay_ms(1000);
+		#endif
+		
+		#ifdef I2C_SLAVE
+		uart_printf("Teste Escravo\n");
+		
+		if (printOk) {
+			printOk = false;
+			
+			uart_printf("Recebido %u\n", varRec);
+		}
+		
+		_delay_ms(1000);
+		#endif // I2C_SLAVE
 	}
+	
+	return 0;
 }

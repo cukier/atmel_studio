@@ -20,6 +20,8 @@ reated by https://www.gitignore.io/api/linux,windows,atmelstudio,libreoffice
 *.hex
 *.map
 *.srec
+*.lss
+*.mk
 
 #User Specific Files
 *.atsuo
