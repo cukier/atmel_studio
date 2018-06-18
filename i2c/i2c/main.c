@@ -26,12 +26,12 @@
 bool printOk;
 uint8_t varRec;
 
-void recOk(uint8_t var) {
+void recFun(uint8_t var) {
 	printOk = true;
 	varRec = var;
 }
 
-void reqOk(void) {
+void reqFun(void) {
 	
 }
 #endif
@@ -41,11 +41,11 @@ int main(void)
 	#ifdef I2C_MASTER
 	TWIInit();
 	TWISetAddress(0x10);
-	TWISetWordAddress();
+	//TWISetWordAddress();
 	#endif
 	
 	#ifdef I2C_SLAVE
-	I2C_setCallbacks(recOk, reqOk);
+	I2C_setCallbacks(recFun, reqFun);
 	I2C_init(0x10);
 	#endif
 	
@@ -64,7 +64,7 @@ int main(void)
 		#endif
 		
 		#ifdef I2C_SLAVE
-		uart_printf("Teste Escravo\n");
+		//uart_printf("Teste Escravo\n");
 		
 		if (printOk) {
 			printOk = false;
